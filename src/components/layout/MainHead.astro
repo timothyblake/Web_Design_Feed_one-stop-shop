@@ -1,0 +1,103 @@
+---
+import { Font } from 'astro:assets';
+import { SITE_TITLE, SITE_DESCRIPTION, TWITTER_HANDLE } from '../../consts';
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Set when the canonical differs from Astro.url (e.g. paginated pages page 1). */
+  canonicalUrl?: URL | string;
+  ogType?: 'website' | 'article';
+  ogImage?: string;
+  ogImageAlt?: string;
+  noindex?: boolean;
+  /** One or more JSON-LD graphs to inject as <script type="application/ld+json">. */
+  structuredData?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const {
+  title,
+  description = SITE_DESCRIPTION,
+  canonicalUrl,
+  ogType = 'website',
+  ogImage = '/og-default.png',
+  ogImageAlt = SITE_TITLE,
+  noindex = false,
+  structuredData,
+} = Astro.props;
+
+const pageTitle = title === SITE_TITLE ? title : `${title} | ${SITE_TITLE}`;
+const canonical = new URL(canonicalUrl ?? Astro.url.pathname, Astro.site);
+const ogImageUrl = new URL(ogImage, Astro.site);
+const feeds = [
+  { title: `${SITE_TITLE} — All Stories`, href: '/rss.xml' },
+  { title: `${SITE_TITLE} — Featured`, href: '/featured.xml' },
+];
+const schemas = structuredData ? (Array.isArray(structuredData) ? structuredData : [structuredData]) : [];
+---
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{pageTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex" />}
+
+<!-- Icons & manifest -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" href="/favicon.ico" sizes="32x32" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<meta name="theme-color" content="#f4ede1" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#2d2926" media="(prefers-color-scheme: dark)" />
+
+<!-- Open Graph -->
+<meta property="og:type" content={ogType} />
+<meta property="og:title" content={pageTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:site_name" content={SITE_TITLE} />
+<meta property="og:image" content={ogImageUrl} />
+<meta property="og:image:alt" content={ogImageAlt} />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content={TWITTER_HANDLE} />
+<meta name="twitter:title" content={pageTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImageUrl} />
+
+<!-- RSS -->
+{feeds.map((feed) => (
+  <link rel="alternate" type="application/rss+xml" title={feed.title} href={feed.href} />
+))}
+
+<!-- Fonts: preconnect + Astro's built-in Fonts API self-hosts PT Serif & Geist
+     with metric-matched fallbacks and auto preloads (the real CLS fix). -->
+<Font cssVariable="--font-headline" preload />
+<Font cssVariable="--font-body" preload />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+  rel="stylesheet"
+/>
+
+{schemas.map((schema) => (
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
+))}
+
+<!-- Theme FOUC prevention: must run before first paint. Re-applied on
+     astro:after-swap because inline head scripts don't re-run across
+     ClientRouter (view transition) navigations. -->
+<script is:inline>
+  (function () {
+    function applyTheme() {
+      var stored = localStorage.getItem('theme');
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var isDark = stored ? stored === 'dark' : prefersDark;
+      document.documentElement.classList.toggle('dark', isDark);
+    }
+    applyTheme();
+    document.addEventListener('astro:after-swap', applyTheme);
+  })();
+</script>

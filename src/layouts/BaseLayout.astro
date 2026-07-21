@@ -1,0 +1,65 @@
+---
+import MainHead from '../components/layout/MainHead.astro';
+import Header from '../components/layout/Header.astro';
+import SideNav from '../components/layout/SideNav.astro';
+import Footer from '../components/layout/Footer.astro';
+import { DEFAULT_LANG } from '../consts';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogType?: 'website' | 'article';
+  ogImage?: string;
+  ogImageAlt?: string;
+  noindex?: boolean;
+  structuredData?: Record<string, unknown> | Record<string, unknown>[];
+  activeCategory?: string;
+  /** Hide the category sidebar on pages where it doesn't apply (about, newsletter, search). */
+  showSideNav?: boolean;
+  lang?: string;
+}
+
+const {
+  title,
+  description,
+  ogType,
+  ogImage,
+  ogImageAlt,
+  noindex,
+  structuredData,
+  activeCategory,
+  showSideNav = true,
+  lang = DEFAULT_LANG,
+} = Astro.props;
+---
+
+<html lang={lang} class="light">
+  <head>
+    <MainHead
+      title={title}
+      description={description}
+      ogType={ogType}
+      ogImage={ogImage}
+      ogImageAlt={ogImageAlt}
+      noindex={noindex}
+      structuredData={structuredData}
+    />
+  </head>
+  <body
+    class="bg-background text-on-background dark:bg-inverse-surface dark:text-inverse-on-surface font-body-md min-h-screen flex flex-col antialiased selection:bg-secondary selection:text-on-secondary transition-colors duration-300"
+  >
+    <a href="#main-content" class="skip-link">Skip to content</a>
+
+    <Header currentPath={Astro.url.pathname} />
+
+    <div class="flex-grow flex w-full max-w-container-max mx-auto relative px-margin-mobile md:px-0">
+      {showSideNav && <SideNav activeCategory={activeCategory} />}
+      <main id="main-content" class="flex-grow py-stack-lg lg:pl-gutter w-full">
+        <slot />
+      </main>
+    </div>
+
+    <Footer />
+  </body>
+</html>

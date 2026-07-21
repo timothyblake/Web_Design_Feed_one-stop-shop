@@ -1,0 +1,74 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StoryCard from '../../components/ui/StoryCard.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
+import SeoBlurb from '../../components/ui/SeoBlurb.astro';
+import PageHeading from '../../components/ui/PageHeading.astro';
+import {
+  CATEGORIES,
+  categoryLabel,
+  CATEGORY_BLURBS,
+  CATEGORY_DESCRIPTIONS,
+  type CategorySlug,
+  SITE_URL,
+} from '../../consts';
+
+export async function getStaticPaths() {
+  const stories = await getCollection('stories');
+  return CATEGORIES.map((category) => ({
+    params: { slug: category.slug },
+    props: {
+      stories: stories
+        .filter((s) => s.data.category === category.slug)
+        .sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf()),
+    },
+  }));
+}
+
+const { slug } = Astro.params as { slug: CategorySlug };
+const { stories } = Astro.props;
+const label = categoryLabel(slug);
+const blurb = CATEGORY_BLURBS[slug];
+const shortDescription = CATEGORY_DESCRIPTIONS[slug];
+const description = `The latest ${label} stories — curated links to the best articles across the web.`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: `${label} stories`,
+  url: `${SITE_URL}/category/${slug}/`,
+  itemListElement: stories.map((story, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    url: story.data.url,
+    name: story.data.title,
+  })),
+};
+---
+
+<BaseLayout title={label} description={description} activeCategory={slug} structuredData={jsonLd}>
+  <Breadcrumb items={[{ label, href: `/category/${slug}/` }]} />
+
+  <PageHeading>{label}</PageHeading>
+
+  <p class="text-on-surface-variant mb-stack-md text-sm leading-relaxed">
+    {shortDescription}
+  </p>
+
+  <ol class="flex flex-col gap-stack-md list-none p-0 m-0">
+    {stories.map((story, i) => (
+      <li>
+        <StoryCard story={story} priority={i < 3} />
+      </li>
+    ))}
+  </ol>
+
+  {stories.length === 0 && (
+    <p class="text-on-surface-variant py-stack-lg text-center">No {label} stories yet — check back soon.</p>
+  )}
+
+  <SeoBlurb title={`About ${label} on Web Design Feed`}>
+    {blurb.map((paragraph) => <p>{paragraph}</p>)}
+  </SeoBlurb>
+</BaseLayout>

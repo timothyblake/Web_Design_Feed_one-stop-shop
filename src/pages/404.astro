@@ -1,0 +1,24 @@
+---
+// Cloudflare Pages (and most static hosts) serve this file with a real
+// HTTP 404 status automatically for unmatched routes — verify after
+// deploy that the response isn't a soft-404 (200 with this content).
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Page Not Found" description="This page doesn't exist." noindex showSideNav={false}>
+  <div class="flex flex-col items-center justify-center text-center py-stack-lg gap-4 min-h-[50vh]">
+    <p class="font-headline-lg text-6xl font-bold text-secondary">404</p>
+    <h1 class="font-headline-lg text-2xl font-bold text-primary dark:text-inverse-on-surface">
+      That story isn't here.
+    </h1>
+    <p class="text-on-surface-variant max-w-prose">
+      The page you're looking for may have been moved or never existed. Try the latest stories instead.
+    </p>
+    <a
+      href="/"
+      class="bg-secondary text-on-secondary font-label-md text-label-md px-6 py-2.5 rounded-lg hover:opacity-90 transition-all shadow-sm font-semibold mt-2"
+    >
+      Back to the feed
+    </a>
+  </div>
+</BaseLayout>

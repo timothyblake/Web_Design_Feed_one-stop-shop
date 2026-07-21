@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from '../components/ui/Breadcrumb.astro';
+import PageHeading from '../components/ui/PageHeading.astro';
+import { SITE_TITLE, SITE_URL, SITE_LOGO, TWITTER_HANDLE } from '../consts';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'AboutPage',
+  url: `${SITE_URL}/about/`,
+  about: {
+    '@type': 'Organization',
+    name: SITE_TITLE,
+    url: SITE_URL,
+    logo: SITE_LOGO,
+    sameAs: [`https://twitter.com/${TWITTER_HANDLE.replace('@', '')}`],
+  },
+};
+---
+
+<BaseLayout
+  title="About"
+  description="What Web Design Feed is, who curates it, and how stories are chosen."
+  structuredData={jsonLd}
+>
+  <Breadcrumb items={[{ label: 'About', href: '/about/' }]} />
+
+  <PageHeading>About {SITE_TITLE}</PageHeading>
+
+  <div class="prose max-w-none text-on-surface-variant leading-relaxed flex flex-col gap-4">
+    <p>
+      {SITE_TITLE} is a curated feed of the best UI design, front-end and back-end development stories from
+      around the web. Every post links straight to the original article — this is a reading list, not a
+      republishing platform.
+    </p>
+    <p>
+      Stories are hand-picked from a rotating list of industry sources, added in under a minute the moment
+      they're worth sharing. The best ones get flagged <a href="/featured/" class="underline hover:text-primary dark:hover:text-inverse-on-surface">Featured</a>
+      and rolled into the <a href="/newsletter/" class="underline hover:text-primary dark:hover:text-inverse-on-surface">weekly newsletter</a>.
+    </p>
+    <p>
+      Prefer to read elsewhere? Subscribe via <a href="/rss.xml" class="underline hover:text-primary dark:hover:text-inverse-on-surface">RSS</a>
+      for everything, or <a href="/featured.xml" class="underline hover:text-primary dark:hover:text-inverse-on-surface">the featured-only feed</a>
+      for just the best-of.
+    </p>
+  </div>
+</BaseLayout>

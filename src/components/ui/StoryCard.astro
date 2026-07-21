@@ -1,0 +1,337 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import { categoryLabel, categoryPillClass } from '../../consts';
+import { relativeTime, formatDate } from '../../utils/formatDate';
+
+interface Props {
+  story: CollectionEntry<'stories'>;
+  /** First 2-3 above-the-fold cards: eager-load their image and skip the entrance delay. */
+  priority?: boolean;
+}
+
+const { story, priority = false } = Astro.props;
+const { title, url, description, source, category, tags, featured, publishedAt, image, imageAlt } = story.data;
+const sourceInitials = source
+  .split(' ')
+  .map((word) => word[0])
+  .slice(0, 2)
+  .join('')
+  .toUpperCase();
+
+let hostname = '';
+try {
+  hostname = new URL(url).hostname.replace(/^www\./, '');
+} catch {
+  hostname = source;
+}
+
+// Google's favicon service is a reliable one-request source icon; the
+// initials badge stays underneath as a fallback if it 404s or is blocked.
+const faviconUrl = hostname
+  ? `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=64`
+  : undefined;
+
+const shareText = `${title} — via ${source}`;
+const twitterShareUrl = `https://twitter.com/intent/tweet?${new URLSearchParams({ url, text: shareText }).toString()}`;
+const linkedInShareUrl = `https://www.linkedin.com/sharing/share-offsite/?${new URLSearchParams({ url }).toString()}`;
+const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSearchParams({ u: url }).toString()}`;
+---
+
+<article
+  class:list={[
+    // No overflow-hidden here: it would clip the share popover. The hero
+    // image's own wrapper below has its own overflow-hidden + rounded-t-xl
+    // to keep the image corners flush with the card.
+    'bg-surface dark:bg-inverse-surface border border-[#dee2e6] dark:border-outline-variant rounded-xl p-stack-md hover:bg-surface-variant/50 transition-colors duration-300 flex flex-col gap-2 relative',
+    !priority && 'animate-fade-up',
+  ]}
+>
+  {featured && (
+    <span
+      class="material-symbols-outlined absolute top-3 right-3 z-10 text-[20px] text-secondary drop-shadow-sm"
+      style="font-variation-settings: 'FILL' 1"
+      aria-hidden="true"
+    >
+      star
+    </span>
+  )}
+
+  {image && (
+    <a href={url} target="_blank" rel="noopener noreferrer" class="block -mx-stack-md -mt-stack-md mb-2 overflow-hidden rounded-t-xl">
+      <Image
+        src={image}
+        alt={imageAlt ?? ''}
+        width={800}
+        height={420}
+        decoding="async"
+        loading={priority ? 'eager' : 'lazy'}
+        fetchpriority={priority ? 'high' : 'auto'}
+        class="w-full h-auto object-cover"
+      />
+    </a>
+  )}
+
+  <div class:list={['flex items-center gap-2 mb-1', featured && 'pr-7']}>
+    <span class="relative w-5 h-5 shrink-0">
+      <span
+        class="favicon-fallback absolute inset-0 flex items-center justify-center bg-surface-variant text-primary text-[8px] px-0.5 rounded uppercase font-bold border border-outline/20"
+        aria-hidden="true"
+      >
+        {sourceInitials}
+      </span>
+      {faviconUrl && (
+        <img
+          src={faviconUrl}
+          alt=""
+          width="20"
+          height="20"
+          loading="lazy"
+          decoding="async"
+          referrerpolicy="no-referrer"
+          class="relative w-5 h-5 rounded object-contain bg-surface-variant"
+          onerror="this.remove()"
+        />
+      )}
+    </span>
+    <span class="font-label-sm text-label-sm font-bold text-primary dark:text-inverse-on-surface">{source}</span>
+    <span class="text-primary text-[10px] opacity-50" aria-hidden="true">•</span>
+    <time datetime={publishedAt.toISOString()} title={formatDate(publishedAt)} class="font-label-sm text-label-sm text-on-surface-variant">
+      {relativeTime(publishedAt)}
+    </time>
+  </div>
+
+  <h2 class="font-headline-md text-primary dark:text-inverse-on-surface mb-1 line-clamp-2 leading-tight font-bold text-xl">
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="hover:text-secondary transition-colors focus-visible:outline-none focus-visible:underline"
+    >
+      {title}
+      <span class="material-symbols-outlined !text-[15px] ml-[5px] align-middle opacity-60" aria-hidden="true">open_in_new</span>
+      <span class="sr-only">(opens {hostname} in a new tab)</span>
+    </a>
+  </h2>
+
+  <p class="font-body-md text-on-surface-variant line-clamp-3 mb-2 text-sm leading-relaxed">{description}</p>
+
+  <div class="flex flex-wrap items-center gap-2 mt-auto pt-3">
+    <a
+      href={`/category/${category}/`}
+      class={`${categoryPillClass(category)} text-on-secondary font-label-md text-label-md px-2 py-1 rounded uppercase tracking-wider text-[10px] font-bold hover:opacity-90 transition-opacity`}
+    >
+      {categoryLabel(category)}
+    </a>
+    {tags.map((tag) => (
+      <a
+        href={`/tag/${tag}/`}
+        class="text-on-surface-variant font-label-md text-label-md text-xs hover:text-primary dark:hover:text-inverse-on-surface transition-colors"
+      >
+        #{tag}
+      </a>
+    ))}
+
+    <div class="ml-auto flex gap-2">
+      <button
+        type="button"
+        class="bookmark-btn text-primary dark:text-inverse-on-surface hover:text-secondary transition-all"
+        aria-pressed="false"
+        aria-label={`Save "${title}" to bookmarks`}
+        data-bookmark-url={url}
+        data-bookmark-title={title}
+        data-bookmark-description={description}
+        data-bookmark-source={source}
+        data-bookmark-category={category}
+        data-bookmark-published={publishedAt.toISOString()}
+      >
+        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">bookmark_add</span>
+      </button>
+      <div class="share-wrapper relative">
+        <button
+          type="button"
+          class="share-btn text-primary dark:text-inverse-on-surface hover:text-secondary transition-all"
+          aria-label={`Share "${title}"`}
+          aria-haspopup="menu"
+          aria-expanded="false"
+          data-share-url={url}
+          data-share-title={title}
+          data-share-text={description}
+        >
+          <span class="material-symbols-outlined text-[20px]" aria-hidden="true">share</span>
+        </button>
+
+        <div
+          class="share-menu hidden absolute right-0 bottom-full mb-2 z-20 w-52 rounded-xl border border-outline bg-background dark:bg-inverse-surface shadow-lg py-1 text-left"
+          role="menu"
+        >
+          <a
+            role="menuitem"
+            href={twitterShareUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-2 px-3 py-2 text-sm text-primary dark:text-inverse-on-surface hover:bg-surface-variant transition-colors"
+          >
+            <span class="w-5 h-5 shrink-0 rounded bg-black text-white flex items-center justify-center text-[10px] font-bold" aria-hidden="true">X</span>
+            Share on X
+          </a>
+          <a
+            role="menuitem"
+            href={linkedInShareUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-2 px-3 py-2 text-sm text-primary dark:text-inverse-on-surface hover:bg-surface-variant transition-colors"
+          >
+            <span class="w-5 h-5 shrink-0 rounded bg-[#0A66C2] text-white flex items-center justify-center text-[9px] font-bold" aria-hidden="true">in</span>
+            Share on LinkedIn
+          </a>
+          <a
+            role="menuitem"
+            href={facebookShareUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-2 px-3 py-2 text-sm text-primary dark:text-inverse-on-surface hover:bg-surface-variant transition-colors"
+          >
+            <span class="w-5 h-5 shrink-0 rounded bg-[#1877F2] text-white flex items-center justify-center text-[11px] font-bold" aria-hidden="true">f</span>
+            Share on Facebook
+          </a>
+          <button
+            type="button"
+            role="menuitem"
+            class="share-native-item hidden items-center gap-2 px-3 py-2 text-sm w-full text-left text-primary dark:text-inverse-on-surface hover:bg-surface-variant transition-colors"
+            data-share-url={url}
+            data-share-title={title}
+            data-share-text={description}
+          >
+            <span class="material-symbols-outlined text-[16px] shrink-0" aria-hidden="true">ios_share</span>
+            More options…
+          </button>
+          <hr class="border-outline/40 my-1" />
+          <button
+            type="button"
+            role="menuitem"
+            class="copy-link-btn flex items-center gap-2 px-3 py-2 text-sm w-full text-left text-primary dark:text-inverse-on-surface hover:bg-surface-variant transition-colors"
+            data-copy-url={url}
+          >
+            <span class="material-symbols-outlined text-[16px] shrink-0" aria-hidden="true">link</span>
+            <span class="copy-label">Copy link</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</article>
+
+<script>
+  import { toggleBookmark, isBookmarked } from '../../lib/bookmarks-client';
+
+  function renderBookmarkButton(btn: HTMLButtonElement) {
+    const url = btn.dataset.bookmarkUrl ?? '';
+    const title = btn.dataset.bookmarkTitle ?? '';
+    const icon = btn.querySelector<HTMLElement>('.material-symbols-outlined');
+    const saved = isBookmarked(url);
+
+    btn.setAttribute('aria-pressed', String(saved));
+    btn.setAttribute('aria-label', `${saved ? 'Remove' : 'Save'} "${title}" ${saved ? 'from' : 'to'} bookmarks`);
+    if (icon) icon.style.fontVariationSettings = `'FILL' ${saved ? 1 : 0}`;
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('.bookmark-btn').forEach((btn) => {
+    if (btn.dataset.bookmarkInit) return;
+    btn.dataset.bookmarkInit = 'true';
+
+    renderBookmarkButton(btn);
+
+    btn.addEventListener('click', () => {
+      toggleBookmark({
+        url: btn.dataset.bookmarkUrl ?? '',
+        title: btn.dataset.bookmarkTitle ?? '',
+        description: btn.dataset.bookmarkDescription ?? '',
+        source: btn.dataset.bookmarkSource ?? '',
+        category: btn.dataset.bookmarkCategory ?? '',
+        publishedAt: btn.dataset.bookmarkPublished ?? '',
+      });
+      renderBookmarkButton(btn);
+    });
+  });
+
+  // Share is a popover of explicit social destinations (X, LinkedIn, Facebook,
+  // copy link) rather than a bare Web Share API call, so desktop users — who
+  // have no native share sheet — still get one-click posting to social sites.
+  function closeAllShareMenus(except?: HTMLElement) {
+    document.querySelectorAll<HTMLElement>('.share-menu').forEach((menu) => {
+      if (menu === except) return;
+      menu.classList.add('hidden');
+      menu.closest('.share-wrapper')?.querySelector('.share-btn')?.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+  document.addEventListener('click', () => closeAllShareMenus());
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeAllShareMenus();
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.share-btn').forEach((btn) => {
+    if (btn.dataset.shareInit) return;
+    btn.dataset.shareInit = 'true';
+
+    const wrapper = btn.closest('.share-wrapper');
+    const menu = wrapper?.querySelector<HTMLElement>('.share-menu');
+    const nativeItem = wrapper?.querySelector<HTMLButtonElement>('.share-native-item');
+
+    if (navigator.share && nativeItem) {
+      nativeItem.classList.remove('hidden');
+      nativeItem.classList.add('flex');
+      nativeItem.addEventListener('click', async () => {
+        closeAllShareMenus();
+        try {
+          await navigator.share({
+            title: nativeItem.dataset.shareTitle ?? '',
+            text: nativeItem.dataset.shareText ?? '',
+            url: nativeItem.dataset.shareUrl ?? '',
+          });
+        } catch {
+          // User cancelled the native share sheet.
+        }
+      });
+    }
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!menu) return;
+      const isOpen = !menu.classList.contains('hidden');
+      closeAllShareMenus(isOpen ? undefined : menu);
+      if (!isOpen) {
+        menu.classList.remove('hidden');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.copy-link-btn').forEach((btn) => {
+    if (btn.dataset.copyInit) return;
+    btn.dataset.copyInit = 'true';
+
+    btn.addEventListener('click', async (e) => {
+      // Keep the menu open long enough to show the "Copied!" confirmation
+      // instead of letting the document-level click-away handler close it.
+      e.stopPropagation();
+      const url = btn.dataset.copyUrl ?? '';
+      const label = btn.querySelector<HTMLElement>('.copy-label');
+
+      try {
+        await navigator.clipboard.writeText(url);
+        if (label) {
+          const original = label.textContent;
+          label.textContent = 'Copied!';
+          setTimeout(() => {
+            label.textContent = original;
+            closeAllShareMenus();
+          }, 900);
+        }
+      } catch {
+        // Clipboard unavailable (e.g. insecure context) — nothing more we can do silently.
+      }
+    });
+  });
+</script>

@@ -1,0 +1,38 @@
+---
+// Buttondown embed — swap the form `action` for your Buttondown username once configured.
+---
+
+<section
+  class="border border-outline rounded-xl p-stack-md flex flex-col gap-2"
+  aria-labelledby="newsletter-cta-heading"
+>
+  <h2 id="newsletter-cta-heading" class="font-headline-md font-bold text-primary dark:text-inverse-on-surface text-lg">
+    The weekly digest
+  </h2>
+  <p class="font-body-md text-sm text-on-surface-variant leading-relaxed">
+    Every Friday, the best stories of the week — picked, not algorithmic.
+  </p>
+  <form
+    action="https://buttondown.email/api/emails/embed-subscribe/webdesignfeed"
+    method="post"
+    target="popupwindow"
+    class="flex flex-col sm:flex-row gap-2 mt-2"
+  >
+    <label for="newsletter-email" class="sr-only">Email address</label>
+    <input
+      id="newsletter-email"
+      type="email"
+      name="email"
+      required
+      autocomplete="email"
+      placeholder="you@example.com"
+      class="flex-grow border border-outline rounded-lg px-3 py-2 text-body-md text-primary dark:text-inverse-on-surface focus:outline-none focus-visible:ring-1 focus-visible:ring-secondary transition-all bg-transparent placeholder:text-on-surface-variant"
+    />
+    <button
+      type="submit"
+      class="bg-secondary text-on-secondary font-label-md text-label-md px-5 py-2 rounded-lg hover:opacity-90 active:scale-95 transition-all font-semibold whitespace-nowrap"
+    >
+      Join Newsletter
+    </button>
+  </form>
+</section>

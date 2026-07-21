@@ -1,0 +1,116 @@
+---
+import type { GetStaticPaths, Page } from 'astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StoryCard from '../components/ui/StoryCard.astro';
+import SeoBlurb from '../components/ui/SeoBlurb.astro';
+import PageHeading from '../components/ui/PageHeading.astro';
+import { SITE_TITLE, SITE_DESCRIPTION, SITE_URL } from '../consts';
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const stories = (await getCollection('stories')).sort(
+    (a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf()
+  );
+  // Inlined rather than a module-scope constant: Astro extracts
+  // getStaticPaths into its own bundle at build time, and outer-scope
+  // references don't reliably survive that extraction.
+  return paginate(stories, { pageSize: 10 });
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props as { page: Page<CollectionEntry<'stories'>> };
+
+const title = page.currentPage === 1
+  ? 'Curated UI Design & Development Stories'
+  : `Latest Stories — Page ${page.currentPage}`;
+
+// SearchAction only needs to appear once — keep it off paginated pages 2+.
+const jsonLd =
+  page.currentPage === 1
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: SITE_TITLE,
+        url: SITE_URL,
+        description: SITE_DESCRIPTION,
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: `${SITE_URL}/search/?q={search_term_string}`,
+          'query-input': 'required name=search_term_string',
+        },
+      }
+    : undefined;
+---
+
+<BaseLayout title={title} description={SITE_DESCRIPTION} structuredData={jsonLd}>
+  <PageHeading>
+    {page.currentPage === 1 ? 'Latest Stories' : `Latest Stories — Page ${page.currentPage}`}
+  </PageHeading>
+
+  {page.currentPage === 1 && (
+    <p class="text-on-surface-variant mb-stack-md text-sm leading-relaxed">
+      Fresh UI design and development stories, curated from across the web.
+    </p>
+  )}
+
+  <ol class="flex flex-col gap-stack-md list-none p-0 m-0">
+    {page.data.map((story, i) => (
+      <li>
+        <StoryCard story={story} priority={page.currentPage === 1 && i < 3} />
+      </li>
+    ))}
+  </ol>
+
+  {page.data.length === 0 && (
+    <p class="text-on-surface-variant py-stack-lg text-center">No stories published yet — check back soon.</p>
+  )}
+
+  {page.lastPage > 1 && (
+    <nav aria-label="Pagination" class="mt-8 flex items-center justify-center gap-3 border-t border-outline pt-8 pb-4">
+      {page.url.prev ? (
+        <a
+          href={page.url.prev}
+          class="border border-outline text-primary dark:text-inverse-on-surface font-label-md text-label-md px-5 py-2.5 rounded-lg hover:bg-surface-variant transition-all font-semibold"
+        >
+          Previous
+        </a>
+      ) : (
+        <span aria-hidden="true" class="px-5 py-2.5 opacity-0">Previous</span>
+      )}
+
+      <span class="text-on-surface-variant text-sm">
+        Page {page.currentPage} of {page.lastPage}
+      </span>
+
+      {page.url.next ? (
+        <a
+          href={page.url.next}
+          class="bg-secondary text-on-secondary font-label-md text-label-md px-6 py-2.5 rounded-lg hover:opacity-90 transition-all shadow-sm font-semibold"
+        >
+          Next
+        </a>
+      ) : (
+        <span aria-hidden="true" class="px-6 py-2.5 opacity-0">Next</span>
+      )}
+    </nav>
+  )}
+
+  {page.currentPage === 1 && (
+    <SeoBlurb title={`About ${SITE_TITLE}`}>
+      <p>
+        {SITE_TITLE} is a curated feed of the best UI design, front-end and back-end development stories from
+        around the web. Every entry links straight to the original article — this is a reading list, not a
+        republishing platform.
+      </p>
+      <p>
+        Stories are hand-picked from a rotating list of industry sources, added the moment they're worth
+        sharing. The best ones get flagged <a href="/featured/" class="underline hover:text-primary dark:hover:text-inverse-on-surface">Featured</a>
+        and rolled into the <a href="/newsletter/" class="underline hover:text-primary dark:hover:text-inverse-on-surface">weekly newsletter</a>.
+      </p>
+      <p>
+        Browse by <a href="/category/ui-design/" class="underline hover:text-primary dark:hover:text-inverse-on-surface">category</a> or
+        subscribe via <a href="/rss.xml" class="underline hover:text-primary dark:hover:text-inverse-on-surface">RSS</a> to
+        follow along without checking back manually.
+      </p>
+    </SeoBlurb>
+  )}
+</BaseLayout>

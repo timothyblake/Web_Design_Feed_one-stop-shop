@@ -1,0 +1,45 @@
+---
+import { SITE_TITLE, SITE_LOGO } from "../../consts";
+const year = new Date().getFullYear();
+---
+
+<footer
+  class="bg-white dark:bg-inverse-surface mt-auto w-full py-8 px-gutter transition-colors shadow-[inset_0_1px_0_rgba(0,0,0,0.15),0_-1px_0_rgba(255,255,255,0.8)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_-1px_0_rgba(0,0,0,0.5)]"
+>
+  <div
+    class="max-w-container-max mx-auto w-full flex flex-col md:flex-row justify-between items-center gap-4"
+  >
+    <nav
+      aria-label="Footer"
+      class="flex flex-wrap gap-x-6 gap-y-2 justify-center"
+    >
+      <a
+        href="/rss.xml"
+        class="text-sm text-on-surface-variant hover:text-primary dark:hover:text-inverse-on-surface transition-colors"
+        >RSS</a
+      >
+      <a
+        href="/featured.xml"
+        class="text-sm text-on-surface-variant hover:text-primary dark:hover:text-inverse-on-surface transition-colors"
+        >Featured RSS</a
+      >
+      <a
+        href="/newsletter/"
+        class="text-sm text-on-surface-variant hover:text-primary dark:hover:text-inverse-on-surface transition-colors"
+        >Newsletter</a
+      >
+      <a
+        href="/about/"
+        class="text-sm text-on-surface-variant hover:text-primary dark:hover:text-inverse-on-surface transition-colors"
+        >About</a
+      >
+    </nav>
+
+    <p
+      class="font-body-md text-sm text-primary dark:text-inverse-on-surface text-center md:text-left"
+    >
+      © {year}
+      {SITE_TITLE}. Built for design-minded engineers.
+    </p>
+  </div>
+</footer>

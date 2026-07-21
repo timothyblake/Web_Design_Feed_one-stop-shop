@@ -1,0 +1,74 @@
+---
+interface Props {
+  title: string;
+  /** Collapsed height before the gradient fade kicks in. */
+  collapsedHeight?: string;
+}
+
+const { title, collapsedHeight = '4.5rem' } = Astro.props;
+---
+
+<section
+  data-seo-blurb
+  class="mt-12 pt-8 border-t border-[#dee2e6] dark:border-outline-variant"
+>
+  <h2 class="font-headline-lg text-[22px] font-bold text-primary dark:text-inverse-on-surface mb-3">
+    {title}
+  </h2>
+
+  <div class="relative">
+    <div
+      data-seo-copy
+      class="prose max-w-none text-on-surface-variant leading-relaxed flex flex-col gap-3 overflow-hidden transition-[max-height] duration-300 ease-in-out"
+      style={`max-height: ${collapsedHeight};`}
+    >
+      <slot />
+    </div>
+    <div
+      data-seo-fade
+      class="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background dark:from-inverse-surface to-transparent transition-opacity duration-300"
+    >
+    </div>
+  </div>
+
+  <button
+    type="button"
+    data-seo-toggle
+    data-collapsed-height={collapsedHeight}
+    aria-expanded="false"
+    class="mt-2 inline-flex items-center gap-1 font-label-md text-label-md font-bold text-primary dark:text-inverse-on-surface hover:text-secondary transition-colors"
+  >
+    <span data-seo-toggle-label>Read More</span>
+    <span
+      data-seo-toggle-icon
+      class="material-symbols-outlined text-[20px] transition-transform duration-300"
+      aria-hidden="true"
+    >
+      expand_more
+    </span>
+  </button>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-seo-toggle]').forEach((toggle) => {
+    const wrapper = toggle.closest('[data-seo-blurb]');
+    const copy = wrapper?.querySelector<HTMLElement>('[data-seo-copy]');
+    const fade = wrapper?.querySelector<HTMLElement>('[data-seo-fade]');
+    const label = toggle.querySelector<HTMLElement>('[data-seo-toggle-label]');
+    const icon = toggle.querySelector<HTMLElement>('[data-seo-toggle-icon]');
+    const collapsedHeight = toggle.dataset.collapsedHeight ?? '4.5rem';
+
+    toggle.setAttribute('aria-controls', copy ? (copy.id ||= crypto.randomUUID()) : '');
+
+    toggle.addEventListener('click', () => {
+      const expanded = toggle.getAttribute('aria-expanded') === 'true';
+      const next = !expanded;
+
+      toggle.setAttribute('aria-expanded', String(next));
+      if (copy) copy.style.maxHeight = next ? `${copy.scrollHeight}px` : collapsedHeight;
+      if (fade) fade.style.opacity = next ? '0' : '1';
+      if (label) label.textContent = next ? 'Read Less' : 'Read More';
+      if (icon) icon.style.transform = next ? 'rotate(180deg)' : 'rotate(0deg)';
+    });
+  });
+</script>

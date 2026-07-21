@@ -1,0 +1,58 @@
+---
+// Pagefind indexes the static dist/ output after `astro build` (see the
+// `postbuild` script) and injects /pagefind/pagefind-ui.js at that time —
+// it isn't present in `astro dev`, so the widget is loaded defensively below.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from '../components/ui/Breadcrumb.astro';
+import PageHeading from '../components/ui/PageHeading.astro';
+---
+
+<BaseLayout title="Search" description="Search Web Design Feed stories." noindex>
+  <Breadcrumb items={[{ label: 'Search', href: '/search/' }]} />
+
+  <PageHeading>Search</PageHeading>
+
+  <div id="search" aria-live="polite"></div>
+  <p id="search-fallback" class="text-on-surface-variant text-sm hidden">
+    Search is only available on the deployed site (it indexes the built output).
+  </p>
+</BaseLayout>
+
+<style>
+  /* Pagefind UI theme hooks — mapped to the site's design tokens. */
+  :global(.pagefind-ui) {
+    --pagefind-ui-primary: var(--color-secondary);
+    --pagefind-ui-text: var(--color-on-surface);
+    --pagefind-ui-background: var(--color-background);
+    --pagefind-ui-border: var(--color-outline);
+    --pagefind-ui-font: var(--font-body-md);
+  }
+</style>
+
+<script>
+  async function mountSearch() {
+    const container = document.getElementById('search');
+    const fallback = document.getElementById('search-fallback');
+    if (!container) return;
+
+    try {
+      // The path is built at runtime (not a static literal) so Vite/Rollup
+      // doesn't try to resolve it at build time — the file only exists
+      // after the postbuild `pagefind --site dist` step runs.
+      const pagefindUiPath = ['', 'pagefind', 'pagefind-ui.js'].join('/');
+      const mod = await import(/* @vite-ignore */ pagefindUiPath);
+      const PagefindUI = (mod as { PagefindUI?: new (opts: unknown) => unknown }).PagefindUI
+        ?? (window as unknown as { PagefindUI?: new (opts: unknown) => unknown }).PagefindUI;
+      if (PagefindUI) {
+        new PagefindUI({ element: '#search', showSubResults: true });
+        return;
+      }
+      throw new Error('PagefindUI unavailable');
+    } catch {
+      fallback?.classList.remove('hidden');
+    }
+  }
+
+  mountSearch();
+  document.addEventListener('astro:page-load', mountSearch);
+</script>

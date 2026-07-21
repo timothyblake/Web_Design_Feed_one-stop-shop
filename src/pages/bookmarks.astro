@@ -1,0 +1,154 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from '../components/ui/Breadcrumb.astro';
+import PageHeading from '../components/ui/PageHeading.astro';
+---
+
+<BaseLayout
+  title="Bookmarks"
+  description="Stories you've saved to read later."
+  noindex
+>
+  <Breadcrumb items={[{ label: 'Bookmarks', href: '/bookmarks/' }]} />
+
+  <PageHeading>Bookmarks</PageHeading>
+
+  <p class="text-on-surface-variant mb-stack-md text-sm leading-relaxed">
+    Stories you save appear here, ready to revisit whenever you need them. Bookmarks are stored locally in this browser.
+  </p>
+
+  <p id="bookmarks-empty" class="text-on-surface-variant py-stack-lg text-center hidden">
+    No bookmarks yet. Tap the <span class="material-symbols-outlined text-[16px] align-middle" aria-hidden="true">bookmark_add</span>
+    icon on any story to save it here — saved locally in this browser.
+  </p>
+
+  <ol id="bookmarks-list" class="flex flex-col gap-stack-md list-none p-0 m-0" aria-live="polite"></ol>
+</BaseLayout>
+
+<script>
+  import { getBookmarks, removeBookmark, type BookmarkItem } from '../lib/bookmarks-client';
+  import { categoryLabel, categoryPillClass } from '../consts';
+  import { relativeTime, formatDate } from '../utils/formatDate';
+
+  const list = document.getElementById('bookmarks-list');
+  const emptyState = document.getElementById('bookmarks-empty');
+
+  function sourceInitials(source: string): string {
+    return source
+      .split(' ')
+      .map((word) => word[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase();
+  }
+
+  function buildCard(item: BookmarkItem): HTMLElement {
+    const li = document.createElement('li');
+
+    const article = document.createElement('article');
+    article.className =
+      'bg-surface dark:bg-inverse-surface border border-[#dee2e6] dark:border-outline-variant rounded-xl p-stack-md flex flex-col gap-2 relative overflow-hidden';
+
+    const meta = document.createElement('div');
+    meta.className = 'flex items-center gap-2 mb-1';
+
+    const faviconWrap = document.createElement('span');
+    faviconWrap.className = 'relative w-5 h-5 shrink-0';
+
+    const badge = document.createElement('span');
+    badge.className =
+      'absolute inset-0 flex items-center justify-center bg-surface-variant text-primary text-[8px] px-0.5 rounded uppercase font-bold border border-outline/20';
+    badge.setAttribute('aria-hidden', 'true');
+    badge.textContent = sourceInitials(item.source);
+    faviconWrap.append(badge);
+
+    let hostname = '';
+    try {
+      hostname = new URL(item.url).hostname.replace(/^www\./, '');
+    } catch {
+      // Malformed URL — fall back to the initials badge only.
+    }
+
+    if (hostname) {
+      const favicon = document.createElement('img');
+      favicon.src = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=64`;
+      favicon.alt = '';
+      favicon.width = 20;
+      favicon.height = 20;
+      favicon.loading = 'lazy';
+      favicon.decoding = 'async';
+      favicon.referrerPolicy = 'no-referrer';
+      favicon.className = 'relative w-5 h-5 rounded object-contain bg-surface-variant';
+      favicon.addEventListener('error', () => favicon.remove());
+      faviconWrap.append(favicon);
+    }
+
+    const sourceEl = document.createElement('span');
+    sourceEl.className = 'font-label-sm text-label-sm font-bold text-primary dark:text-inverse-on-surface';
+    sourceEl.textContent = item.source;
+
+    const time = document.createElement('time');
+    const publishedDate = new Date(item.publishedAt);
+    time.dateTime = publishedDate.toISOString();
+    time.title = formatDate(publishedDate);
+    time.className = 'font-label-sm text-label-sm text-on-surface-variant';
+    time.textContent = relativeTime(publishedDate);
+
+    meta.append(faviconWrap, sourceEl, time);
+
+    const heading = document.createElement('h2');
+    heading.className =
+      'font-headline-md text-primary dark:text-inverse-on-surface mb-1 line-clamp-2 leading-tight font-bold text-xl';
+    const titleLink = document.createElement('a');
+    titleLink.href = item.url;
+    titleLink.target = '_blank';
+    titleLink.rel = 'noopener noreferrer';
+    titleLink.className = 'hover:text-secondary transition-colors focus-visible:outline-none focus-visible:underline';
+    titleLink.textContent = item.title;
+    heading.append(titleLink);
+
+    const description = document.createElement('p');
+    description.className = 'font-body-md text-on-surface-variant line-clamp-3 mb-2 text-sm leading-relaxed';
+    description.textContent = item.description;
+
+    const footer = document.createElement('div');
+    footer.className = 'flex flex-wrap items-center gap-2 mt-auto pt-3';
+
+    const categoryPill = document.createElement('a');
+    categoryPill.href = `/category/${item.category}/`;
+    categoryPill.className = `${categoryPillClass(item.category)} text-on-secondary font-label-md text-label-md px-2 py-1 rounded uppercase tracking-wider text-[10px] font-bold hover:opacity-90 transition-opacity`;
+    categoryPill.textContent = categoryLabel(item.category);
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'ml-auto text-primary dark:text-inverse-on-surface hover:text-secondary transition-all';
+    removeBtn.setAttribute('aria-label', `Remove "${item.title}" from bookmarks`);
+    removeBtn.innerHTML = '<span class="material-symbols-outlined text-[20px]" aria-hidden="true">delete</span>';
+    removeBtn.addEventListener('click', () => {
+      removeBookmark(item.url);
+      li.remove();
+      renderEmptyState();
+    });
+
+    footer.append(categoryPill, removeBtn);
+    article.append(meta, heading, description, footer);
+    li.append(article);
+    return li;
+  }
+
+  function renderEmptyState() {
+    const isEmpty = list?.children.length === 0;
+    emptyState?.classList.toggle('hidden', !isEmpty);
+  }
+
+  function render() {
+    if (!list) return;
+    list.innerHTML = '';
+    for (const item of getBookmarks()) {
+      list.append(buildCard(item));
+    }
+    renderEmptyState();
+  }
+
+  render();
+</script>

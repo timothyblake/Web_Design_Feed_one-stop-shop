@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+Disallow: /search/
+Disallow: /*?q=
+Disallow: /*?*
+
+# AI crawlers — explicit allow, not an accident. This is a link-out
+# aggregator; being cited/summarized drives traffic to source articles.
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+Sitemap: https://webdesignfeed.com/sitemap-index.xml
