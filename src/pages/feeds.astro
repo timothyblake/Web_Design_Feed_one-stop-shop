@@ -1,0 +1,86 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from '../components/ui/Breadcrumb.astro';
+import PageHeading from '../components/ui/PageHeading.astro';
+import { SITE_URL } from '../consts';
+
+const feeds = [
+  {
+    title: 'All Stories',
+    href: '/rss.xml',
+    description:
+      'Follow every story published across UI design, front-end, back-end, tools, and careers.',
+    detail: 'Best for a complete reading list or for powering your own RSS automations.',
+    button: 'Subscribe to all stories',
+  },
+  {
+    title: 'Featured Stories',
+    href: '/featured.xml',
+    description:
+      "Follow only the editor's picks—the strongest articles selected for the weekly digest.",
+    detail: 'Best for a quieter, lower-volume feed containing only the essential reads.',
+    button: 'Subscribe to featured stories',
+  },
+];
+---
+
+<BaseLayout
+  title="RSS Feeds"
+  description="Subscribe to Web Design Feed's complete RSS feed or the featured-stories feed."
+>
+  <Breadcrumb items={[{ label: 'RSS Feeds', href: '/feeds/' }]} />
+
+  <PageHeading>RSS Feeds</PageHeading>
+
+  <p class="text-on-surface-variant mb-stack-lg leading-relaxed">
+    Choose the feed that matches how you read. Both feeds update automatically and link directly to the
+    original articles, so you can follow Web Design Feed from any RSS reader without checking the site.
+  </p>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+    {feeds.map((feed) => (
+      <article class="bg-white dark:bg-inverse-surface rounded-xl p-stack-md flex flex-col gap-3 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.15),0_0_0_1px_rgba(255,255,255,0.8)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1),0_0_0_1px_rgba(0,0,0,0.5)]">
+        <div class="flex items-center gap-3">
+          <span
+            class="material-symbols-outlined text-secondary text-[28px]"
+            style="font-variation-settings: 'FILL' 1"
+            aria-hidden="true"
+          >
+            rss_feed
+          </span>
+          <h2 class="font-headline-md text-xl font-bold text-primary dark:text-inverse-on-surface">
+            {feed.title}
+          </h2>
+        </div>
+
+        <p class="text-on-surface-variant text-sm leading-relaxed">{feed.description}</p>
+        <p class="text-on-surface-variant text-sm leading-relaxed">{feed.detail}</p>
+
+        <code class="block mt-1 rounded-lg bg-surface-variant px-3 py-2 text-xs text-primary overflow-x-auto">
+          {new URL(feed.href, SITE_URL).toString()}
+        </code>
+
+        <a
+          href={feed.href}
+          type="application/rss+xml"
+          class="mt-auto inline-flex items-center justify-center gap-2 rounded-lg bg-secondary px-5 py-2.5 text-sm font-semibold text-on-secondary hover:opacity-90 active:scale-[0.98] transition-all"
+          aria-label={`${feed.button} using RSS`}
+        >
+          <span class="material-symbols-outlined text-[18px]" aria-hidden="true">rss_feed</span>
+          {feed.button}
+        </a>
+      </article>
+    ))}
+  </div>
+
+  <section class="mt-stack-lg pt-stack-md border-t border-[#dee2e6] dark:border-outline-variant" aria-labelledby="using-rss-heading">
+    <h2 id="using-rss-heading" class="font-headline-md text-xl font-bold text-primary dark:text-inverse-on-surface mb-2">
+      How to use the feeds
+    </h2>
+    <p class="text-on-surface-variant text-sm leading-relaxed">
+      Open a feed using the button above, or copy its URL into your preferred RSS reader. New stories will
+      appear there automatically, with the title, summary, category, source, and a direct link to the original
+      publisher.
+    </p>
+  </section>
+</BaseLayout>

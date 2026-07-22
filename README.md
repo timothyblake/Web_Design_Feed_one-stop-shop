@@ -127,11 +127,15 @@ The production build is important for testing search because the Pagefind index 
 .
 ├── public/
 │   ├── _headers                 # Security and cache headers
+│   ├── apple-touch-icon.png
 │   ├── favicon.ico
 │   ├── favicon.svg
-│   ├── manifest.webmanifest
+│   ├── favicon-96x96.png
 │   ├── og-default.png           # Default social sharing image
-│   └── robots.txt
+│   ├── robots.txt
+│   ├── site.webmanifest
+│   ├── web-app-manifest-192x192.png
+│   └── web-app-manifest-512x512.png
 ├── src/
 │   ├── components/
 │   │   ├── layout/
@@ -208,6 +212,7 @@ The original article URL is the story's primary link. There are intentionally no
 | `/` | `src/pages/[...page].astro` | Indexed | Latest stories, first page of the paginated feed. |
 | `/2/`, `/3/`, etc. | `src/pages/[...page].astro` | Indexed | Additional feed pages when enough stories exist. |
 | `/featured/` | `src/pages/featured.astro` | Indexed | Stories marked `featured: true`. |
+| `/feeds/` | `src/pages/feeds.astro` | Indexed | Landing page for the complete and featured-only RSS feeds. |
 | `/category/:slug/` | `src/pages/category/[slug].astro` | Indexed | Statically generated archive for each configured category. |
 | `/tag/:slug/` | `src/pages/tag/[slug].astro` | Noindex | Statically generated archive for every tag found in story content. |
 | `/search/` | `src/pages/search.astro` | Noindex | Pagefind search interface in production builds. |
@@ -619,7 +624,7 @@ Check network access to Google Fonts and confirm the deployed CSP still permits 
 - Update `SITE_TITLE`, `SITE_DESCRIPTION`, `SITE_URL`, `SITE_LOGO`, and `TWITTER_HANDLE` in `src/consts.ts`.
 - Update `site` in `astro.config.mjs`.
 - Replace favicon, manifest, and Open Graph assets in `public/`.
-- Review theme colors in `global.css` and `manifest.webmanifest`.
+- Review theme colors in `global.css` and `site.webmanifest`.
 - Review metadata, feed titles, `robots.txt`, and external account URLs.
 
 ### Changing domains or hosting
