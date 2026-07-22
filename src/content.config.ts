@@ -1,27 +1,29 @@
 import { defineCollection, z } from 'astro:content';
-import { glob } from 'astro/loaders';
+import { sanityStoriesLoader } from './loaders/sanityStories';
 import { CATEGORIES } from './consts';
 
 const categorySlugs = CATEGORIES.map((c) => c.slug) as [string, ...string[]];
 
-// Content Layer API (Astro 5+): loader-based collection, replaces the legacy
-// src/content/config.ts pattern. Swap `glob()` for a custom loader if/when
-// stories move to Sanity or another headless CMS.
+// Content Layer API (Astro 5+): loader-based collection. Stories live in
+// Sanity now — the loader fetches them via GROQ at build/dev time. `image`
+// is a plain Sanity CDN URL (not an astro:assets `image()` reference, which
+// only resolves local files), rendered as a remote <img> in StoryCard.
 const stories = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/stories' }),
-  schema: ({ image }) =>
-    z.object({
-      title: z.string(),
-      url: z.string().url(),
-      description: z.string().min(1).max(280),
-      source: z.string(),
-      category: z.enum(categorySlugs),
-      tags: z.array(z.string()).default([]),
-      featured: z.boolean().default(false),
-      publishedAt: z.coerce.date(),
-      image: image().optional(),
-      imageAlt: z.string().optional(),
-    }),
+  loader: sanityStoriesLoader(),
+  schema: z.object({
+    title: z.string(),
+    url: z.string().url(),
+    description: z.string().min(1).max(280),
+    source: z.string(),
+    category: z.enum(categorySlugs),
+    tags: z.array(z.string()).default([]),
+    featured: z.boolean().default(false),
+    publishedAt: z.coerce.date(),
+    // GROQ returns `null` (not absent) for stories without an image, and
+    // zod's `.optional()` only accepts `undefined` — `.nullish()` covers both.
+    image: z.string().url().nullish(),
+    imageAlt: z.string().nullish(),
+  }),
 });
 
 export const collections = { stories };

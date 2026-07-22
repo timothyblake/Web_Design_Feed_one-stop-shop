@@ -5,6 +5,7 @@ import StoryCard from '../components/ui/StoryCard.astro';
 import Breadcrumb from '../components/ui/Breadcrumb.astro';
 import SeoBlurb from '../components/ui/SeoBlurb.astro';
 import PageHeading from '../components/ui/PageHeading.astro';
+import ViewToggle from '../components/ui/ViewToggle.astro';
 
 const stories = (await getCollection('stories', ({ data }) => data.featured)).sort(
   (a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf()
@@ -17,12 +18,15 @@ const stories = (await getCollection('stories', ({ data }) => data.featured)).so
 >
   <Breadcrumb items={[{ label: 'Featured', href: '/featured/' }]} />
 
-  <PageHeading>Editor's Picks</PageHeading>
+  <PageHeading>
+    Editor's Picks
+    <ViewToggle slot="actions" />
+  </PageHeading>
   <p class="text-on-surface-variant mb-stack-md text-sm">
     The best stories of the week, hand-picked. Powers the <a href="/newsletter/" class="underline hover:text-primary dark:hover:text-inverse-on-surface">weekly digest</a>.
   </p>
 
-  <ol class="flex flex-col gap-stack-md list-none p-0 m-0">
+  <ol data-story-list class="flex flex-col gap-stack-md list-none p-0 m-0">
     {stories.map((story, i) => (
       <li>
         <StoryCard story={story} priority={i < 3} />

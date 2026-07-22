@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumb from '../components/ui/Breadcrumb.astro';
 import PageHeading from '../components/ui/PageHeading.astro';
+import ViewToggle from '../components/ui/ViewToggle.astro';
 ---
 
 <BaseLayout
@@ -11,7 +12,10 @@ import PageHeading from '../components/ui/PageHeading.astro';
 >
   <Breadcrumb items={[{ label: 'Bookmarks', href: '/bookmarks/' }]} />
 
-  <PageHeading>Bookmarks</PageHeading>
+  <PageHeading>
+    Bookmarks
+    <ViewToggle slot="actions" />
+  </PageHeading>
 
   <p class="text-on-surface-variant mb-stack-md text-sm leading-relaxed">
     Stories you save appear here, ready to revisit whenever you need them. Bookmarks are stored locally in this browser.
@@ -22,16 +26,13 @@ import PageHeading from '../components/ui/PageHeading.astro';
     icon on any story to save it here — saved locally in this browser.
   </p>
 
-  <ol id="bookmarks-list" class="flex flex-col gap-stack-md list-none p-0 m-0" aria-live="polite"></ol>
+  <ol id="bookmarks-list" data-story-list class="flex flex-col gap-stack-md list-none p-0 m-0" aria-live="polite"></ol>
 </BaseLayout>
 
 <script>
   import { getBookmarks, removeBookmark, type BookmarkItem } from '../lib/bookmarks-client';
   import { categoryLabel, categoryPillClass } from '../consts';
   import { relativeTime, formatDate } from '../utils/formatDate';
-
-  const list = document.getElementById('bookmarks-list');
-  const emptyState = document.getElementById('bookmarks-empty');
 
   function sourceInitials(source: string): string {
     return source
@@ -137,11 +138,17 @@ import PageHeading from '../components/ui/PageHeading.astro';
   }
 
   function renderEmptyState() {
+    const list = document.getElementById('bookmarks-list');
+    const emptyState = document.getElementById('bookmarks-empty');
     const isEmpty = list?.children.length === 0;
     emptyState?.classList.toggle('hidden', !isEmpty);
   }
 
+  // Re-queries the list each call (rather than closing over a module-level
+  // const) because ClientRouter swaps in a brand-new #bookmarks-list element
+  // on every navigation back to this page — the old reference would be stale.
   function render() {
+    const list = document.getElementById('bookmarks-list');
     if (!list) return;
     list.innerHTML = '';
     for (const item of getBookmarks()) {
@@ -151,4 +158,5 @@ import PageHeading from '../components/ui/PageHeading.astro';
   }
 
   render();
+  document.addEventListener('astro:page-load', render);
 </script>

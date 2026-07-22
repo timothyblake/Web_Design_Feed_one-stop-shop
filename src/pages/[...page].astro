@@ -5,6 +5,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import StoryCard from '../components/ui/StoryCard.astro';
 import SeoBlurb from '../components/ui/SeoBlurb.astro';
 import PageHeading from '../components/ui/PageHeading.astro';
+import ViewToggle from '../components/ui/ViewToggle.astro';
 import { SITE_TITLE, SITE_DESCRIPTION, SITE_URL } from '../consts';
 
 export const getStaticPaths = (async ({ paginate }) => {
@@ -44,6 +45,7 @@ const jsonLd =
 <BaseLayout title={title} description={SITE_DESCRIPTION} structuredData={jsonLd}>
   <PageHeading>
     {page.currentPage === 1 ? 'Latest Stories' : `Latest Stories — Page ${page.currentPage}`}
+    <ViewToggle slot="actions" />
   </PageHeading>
 
   {page.currentPage === 1 && (
@@ -52,7 +54,7 @@ const jsonLd =
     </p>
   )}
 
-  <ol class="flex flex-col gap-stack-md list-none p-0 m-0">
+  <ol data-story-list class="flex flex-col gap-stack-md list-none p-0 m-0">
     {page.data.map((story, i) => (
       <li>
         <StoryCard story={story} priority={page.currentPage === 1 && i < 3} />

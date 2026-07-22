@@ -1,0 +1,98 @@
+---
+// Switches every `[data-story-list]` on the page between the default
+// single-column list and a grid. Preference persists in localStorage so it
+// carries across full page navigations (this site has no client router).
+// Plain CSS below (not Tailwind utilities) because the layout class is
+// applied at runtime via classList.toggle — Tailwind's build-time scanner
+// only sees literal classes in markup, so responsive utility strings
+// assembled in JS get purged from the production build.
+---
+
+<div class="view-toggle hidden sm:flex items-center gap-1 shrink-0" role="group" aria-label="Story layout">
+  <button
+    type="button"
+    class="view-toggle-btn p-1.5 rounded-lg text-primary dark:text-inverse-on-surface hover:bg-surface-variant transition-colors"
+    data-view-btn="list"
+    aria-pressed="true"
+    aria-label="List view"
+  >
+    <span class="material-symbols-outlined text-[20px]" aria-hidden="true">view_list</span>
+  </button>
+  <button
+    type="button"
+    class="view-toggle-btn p-1.5 rounded-lg text-primary dark:text-inverse-on-surface hover:bg-surface-variant transition-colors"
+    data-view-btn="grid"
+    aria-pressed="false"
+    aria-label="Grid view"
+  >
+    <span class="material-symbols-outlined text-[20px]" aria-hidden="true">grid_view</span>
+  </button>
+</div>
+
+<style is:global>
+  [data-story-list].is-grid-view {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  /* Grid items stretch to the row height by default, but that height has to
+     be passed down through the <li> to the card itself for equal-height rows. */
+  [data-story-list].is-grid-view > li {
+    display: flex;
+  }
+
+  [data-story-list].is-grid-view > li > article {
+    flex: 1;
+    width: 100%;
+  }
+
+  @media (min-width: 640px) {
+    [data-story-list].is-grid-view {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1280px) {
+    [data-story-list].is-grid-view {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>
+
+<script>
+  const STORAGE_KEY = 'story-view-mode';
+
+  type ViewMode = 'list' | 'grid';
+
+  function applyView(mode: ViewMode) {
+    document.querySelectorAll<HTMLElement>('[data-story-list]').forEach((list) => {
+      list.classList.toggle('is-grid-view', mode === 'grid');
+    });
+    document.querySelectorAll<HTMLButtonElement>('[data-view-btn]').forEach((btn) => {
+      const active = btn.dataset.viewBtn === mode;
+      btn.setAttribute('aria-pressed', String(active));
+      btn.classList.toggle('bg-surface-variant', active);
+      btn.classList.toggle('text-secondary', active);
+    });
+  }
+
+  function initViewToggle() {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    applyView(stored === 'grid' ? 'grid' : 'list');
+
+    document.querySelectorAll<HTMLButtonElement>('[data-view-btn]').forEach((btn) => {
+      if (btn.dataset.viewInit) return;
+      btn.dataset.viewInit = 'true';
+
+      btn.addEventListener('click', () => {
+        const mode = btn.dataset.viewBtn as ViewMode;
+        localStorage.setItem(STORAGE_KEY, mode);
+        applyView(mode);
+      });
+    });
+  }
+
+  initViewToggle();
+  document.addEventListener('astro:page-load', initViewToggle);
+</script>

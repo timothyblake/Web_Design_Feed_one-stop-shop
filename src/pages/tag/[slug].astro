@@ -4,6 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import StoryCard from '../../components/ui/StoryCard.astro';
 import Breadcrumb from '../../components/ui/Breadcrumb.astro';
 import PageHeading from '../../components/ui/PageHeading.astro';
+import ViewToggle from '../../components/ui/ViewToggle.astro';
 
 export async function getStaticPaths() {
   const stories = await getCollection('stories');
@@ -30,9 +31,12 @@ const { stories } = Astro.props;
 >
   <Breadcrumb items={[{ label: `#${slug}`, href: `/tag/${slug}/` }]} />
 
-  <PageHeading>#{slug}</PageHeading>
+  <PageHeading>
+    #{slug}
+    <ViewToggle slot="actions" />
+  </PageHeading>
 
-  <ol class="flex flex-col gap-stack-md list-none p-0 m-0">
+  <ol data-story-list class="flex flex-col gap-stack-md list-none p-0 m-0">
     {stories.map((story, i) => (
       <li>
         <StoryCard story={story} priority={i < 3} />

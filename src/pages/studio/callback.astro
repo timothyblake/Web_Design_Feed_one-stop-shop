@@ -1,0 +1,25 @@
+---
+// Sanity's Studio login flow redirects the browser to
+// `<origin>/<basePath>/callback` (basePath: '/studio', set in
+// sanity.config.ts) to complete auth. The main `/studio` route is injected
+// by @sanity/astro as a single exact-match path (hash-routed SPA), so it
+// doesn't itself resolve `/studio/callback` — this page re-mounts the same
+// Studio bundle at that exact path so its auth-boot code can pick up the
+// `sid`/`url` query params, finish the token exchange, and hand off to the
+// running Studio.
+import { StudioComponentHash } from '@sanity/astro/studio/studio-component.tsx';
+
+export const prerender = true;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <title>Sanity Studio</title>
+  </head>
+  <body>
+    <StudioComponentHash client:only="react" />
+  </body>
+</html>

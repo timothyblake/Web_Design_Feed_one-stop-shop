@@ -1,0 +1,22 @@
+[
+  {
+    "title": "Designing for High-Density Interfaces",
+    "url": "https://example.com/high-density-interfaces",
+    "description": "How to pack more information into a screen without overwhelming the user — spacing, hierarchy, and progressive disclosure.",
+    "source": "Example Design Blog",
+    "category": "ui-design",
+    "tags": ["design-systems", "accessibility"],
+    "featured": true,
+    "publishedAt": "2026-07-15T09:00:00Z"
+  },
+  {
+    "title": "A Practical Guide to Container Queries",
+    "url": "https://example.com/container-queries",
+    "description": "Container queries let components adapt to their own size, not the viewport — here's how to use them today.",
+    "source": "Example Dev Blog",
+    "category": "front-end",
+    "tags": ["css"],
+    "featured": false,
+    "publishedAt": "2026-07-10T09:00:00Z"
+  }
+]
