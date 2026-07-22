@@ -95,7 +95,7 @@ const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSe
     </span>
     <span class="font-label-sm text-label-sm font-bold text-primary dark:text-inverse-on-surface">{source}</span>
     <span class="text-primary text-[10px] opacity-50" aria-hidden="true">•</span>
-    <time datetime={publishedAt.toISOString()} title={formatDate(publishedAt)} class="font-label-sm text-[11px] sm:text-label-sm text-on-surface-variant">
+    <time datetime={publishedAt.toISOString()} title={formatDate(publishedAt)} class="font-label-sm text-xs text-on-surface-variant">
       {relativeTime(publishedAt)}
     </time>
   </div>
@@ -235,6 +235,25 @@ const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSe
     if (icon) icon.style.fontVariationSettings = `'FILL' ${saved ? 1 : 0}`;
   }
 
+  document.querySelectorAll<HTMLButtonElement>('.bookmark-btn').forEach((btn) => {
+    if (btn.dataset.bookmarkInit) return;
+    btn.dataset.bookmarkInit = 'true';
+
+    renderBookmarkButton(btn);
+
+    btn.addEventListener('click', () => {
+      toggleBookmark({
+        url: btn.dataset.bookmarkUrl ?? '',
+        title: btn.dataset.bookmarkTitle ?? '',
+        description: btn.dataset.bookmarkDescription ?? '',
+        source: btn.dataset.bookmarkSource ?? '',
+        category: btn.dataset.bookmarkCategory ?? '',
+        publishedAt: btn.dataset.bookmarkPublished ?? '',
+      });
+      renderBookmarkButton(btn);
+    });
+  });
+
   // Share is a popover of explicit social destinations (X, LinkedIn, Facebook,
   // copy link) rather than a bare Web Share API call, so desktop users — who
   // have no native share sheet — still get one-click posting to social sites.
@@ -246,101 +265,72 @@ const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSe
     });
   }
 
-  // Cards are swapped in wholesale on every ClientRouter navigation, so this
-  // init has to re-run per page-load — the dataset flags below just guard
-  // against binding the same (still-present) element twice within one page.
-  function initStoryCards() {
-    document.querySelectorAll<HTMLButtonElement>('.bookmark-btn').forEach((btn) => {
-      if (btn.dataset.bookmarkInit) return;
-      btn.dataset.bookmarkInit = 'true';
-
-      renderBookmarkButton(btn);
-
-      btn.addEventListener('click', () => {
-        toggleBookmark({
-          url: btn.dataset.bookmarkUrl ?? '',
-          title: btn.dataset.bookmarkTitle ?? '',
-          description: btn.dataset.bookmarkDescription ?? '',
-          source: btn.dataset.bookmarkSource ?? '',
-          category: btn.dataset.bookmarkCategory ?? '',
-          publishedAt: btn.dataset.bookmarkPublished ?? '',
-        });
-        renderBookmarkButton(btn);
-      });
-    });
-
-    document.querySelectorAll<HTMLButtonElement>('.share-btn').forEach((btn) => {
-      if (btn.dataset.shareInit) return;
-      btn.dataset.shareInit = 'true';
-
-      const wrapper = btn.closest('.share-wrapper');
-      const menu = wrapper?.querySelector<HTMLElement>('.share-menu');
-      const nativeItem = wrapper?.querySelector<HTMLButtonElement>('.share-native-item');
-
-      if (navigator.share && nativeItem) {
-        nativeItem.classList.remove('hidden');
-        nativeItem.classList.add('flex');
-        nativeItem.addEventListener('click', async () => {
-          closeAllShareMenus();
-          try {
-            await navigator.share({
-              title: nativeItem.dataset.shareTitle ?? '',
-              text: nativeItem.dataset.shareText ?? '',
-              url: nativeItem.dataset.shareUrl ?? '',
-            });
-          } catch {
-            // User cancelled the native share sheet.
-          }
-        });
-      }
-
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (!menu) return;
-        const isOpen = !menu.classList.contains('hidden');
-        closeAllShareMenus(isOpen ? undefined : menu);
-        if (!isOpen) {
-          menu.classList.remove('hidden');
-          btn.setAttribute('aria-expanded', 'true');
-        }
-      });
-    });
-
-    document.querySelectorAll<HTMLButtonElement>('.copy-link-btn').forEach((btn) => {
-      if (btn.dataset.copyInit) return;
-      btn.dataset.copyInit = 'true';
-
-      btn.addEventListener('click', async (e) => {
-        // Keep the menu open long enough to show the "Copied!" confirmation
-        // instead of letting the document-level click-away handler close it.
-        e.stopPropagation();
-        const url = btn.dataset.copyUrl ?? '';
-        const label = btn.querySelector<HTMLElement>('.copy-label');
-
-        try {
-          await navigator.clipboard.writeText(url);
-          if (label) {
-            const original = label.textContent;
-            label.textContent = 'Copied!';
-            setTimeout(() => {
-              label.textContent = original;
-              closeAllShareMenus();
-            }, 900);
-          }
-        } catch {
-          // Clipboard unavailable (e.g. insecure context) — nothing more we can do silently.
-        }
-      });
-    });
-  }
-
-  initStoryCards();
-  document.addEventListener('astro:page-load', initStoryCards);
-
-  // Document-level listeners only need binding once — `document` itself
-  // persists across ClientRouter navigations, unlike the cards it queries.
   document.addEventListener('click', () => closeAllShareMenus());
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeAllShareMenus();
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.share-btn').forEach((btn) => {
+    if (btn.dataset.shareInit) return;
+    btn.dataset.shareInit = 'true';
+
+    const wrapper = btn.closest('.share-wrapper');
+    const menu = wrapper?.querySelector<HTMLElement>('.share-menu');
+    const nativeItem = wrapper?.querySelector<HTMLButtonElement>('.share-native-item');
+
+    if (navigator.share && nativeItem) {
+      nativeItem.classList.remove('hidden');
+      nativeItem.classList.add('flex');
+      nativeItem.addEventListener('click', async () => {
+        closeAllShareMenus();
+        try {
+          await navigator.share({
+            title: nativeItem.dataset.shareTitle ?? '',
+            text: nativeItem.dataset.shareText ?? '',
+            url: nativeItem.dataset.shareUrl ?? '',
+          });
+        } catch {
+          // User cancelled the native share sheet.
+        }
+      });
+    }
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!menu) return;
+      const isOpen = !menu.classList.contains('hidden');
+      closeAllShareMenus(isOpen ? undefined : menu);
+      if (!isOpen) {
+        menu.classList.remove('hidden');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.copy-link-btn').forEach((btn) => {
+    if (btn.dataset.copyInit) return;
+    btn.dataset.copyInit = 'true';
+
+    btn.addEventListener('click', async (e) => {
+      // Keep the menu open long enough to show the "Copied!" confirmation
+      // instead of letting the document-level click-away handler close it.
+      e.stopPropagation();
+      const url = btn.dataset.copyUrl ?? '';
+      const label = btn.querySelector<HTMLElement>('.copy-label');
+
+      try {
+        await navigator.clipboard.writeText(url);
+        if (label) {
+          const original = label.textContent;
+          label.textContent = 'Copied!';
+          setTimeout(() => {
+            label.textContent = original;
+            closeAllShareMenus();
+          }, 900);
+        }
+      } catch {
+        // Clipboard unavailable (e.g. insecure context) — nothing more we can do silently.
+      }
+    });
   });
 </script>

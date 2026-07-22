@@ -1,5 +1,4 @@
 ---
-import { ClientRouter } from 'astro:transitions';
 import MainHead from '../components/layout/MainHead.astro';
 import Header from '../components/layout/Header.astro';
 import SideNav from '../components/layout/SideNav.astro';
@@ -46,7 +45,6 @@ const {
       noindex={noindex}
       structuredData={structuredData}
     />
-    <ClientRouter />
   </head>
   <body
     class="bg-background text-on-background dark:bg-inverse-surface dark:text-inverse-on-surface font-body-md min-h-screen flex flex-col antialiased selection:bg-secondary selection:text-on-secondary transition-colors duration-300"

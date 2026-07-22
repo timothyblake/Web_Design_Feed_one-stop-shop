@@ -21,8 +21,8 @@ function isActive(href: string): boolean {
 <header
   class="bg-surface dark:bg-inverse-surface sticky top-0 border-b border-[#dee2e6] dark:border-outline-variant z-50 transition-colors duration-300"
 >
-  <div class="grid grid-cols-[auto_1fr_auto] md:grid-cols-[1fr_auto_1fr] items-center px-gutter w-full h-16 max-w-container-max mx-auto">
-    <div class="contents md:flex md:items-center md:gap-stack-lg md:justify-self-start">
+  <div class="grid grid-cols-[1fr_auto_1fr] items-center px-gutter w-full h-16 max-w-container-max mx-auto">
+    <div class="flex items-center gap-stack-lg justify-self-start">
       <button
         id="mobile-menu-btn"
         class="md:hidden text-primary dark:text-inverse-on-surface p-2 -ml-2 rounded-lg hover:bg-surface-variant transition-colors"
@@ -33,8 +33,8 @@ function isActive(href: string): boolean {
         <span class="material-symbols-outlined" aria-hidden="true">menu</span>
       </button>
 
-      <a href="/" class="flex items-center justify-self-center md:justify-self-auto gap-2" aria-label={SITE_TITLE}>
-        <img src={SITE_LOGO} alt={SITE_TITLE} class="h-7 md:h-6 w-auto object-contain dark:invert" width="160" height="24" />
+      <a href="/" class="flex items-center gap-2" aria-label={SITE_TITLE}>
+        <img src={SITE_LOGO} alt={SITE_TITLE} class="h-6 w-auto object-contain dark:invert" width="160" height="24" />
       </a>
     </div>
 
@@ -90,7 +90,7 @@ function isActive(href: string): boolean {
         id="bookmarks-link"
         href="/bookmarks/"
         aria-current={isActive('/bookmarks/') ? 'page' : undefined}
-        class="relative -mr-2 md:mr-0 text-primary dark:text-inverse-on-surface p-2 rounded-full hover:bg-surface-variant transition-colors"
+        class="relative text-primary dark:text-inverse-on-surface p-2 rounded-full hover:bg-surface-variant transition-colors"
         aria-label="View bookmarks"
       >
         <span class="material-symbols-outlined block" aria-hidden="true">bookmark</span>
@@ -179,17 +179,15 @@ function isActive(href: string): boolean {
 <script>
   import { BOOKMARKS_CHANGED_EVENT, getBookmarks } from '../../lib/bookmarks-client';
 
-  // The whole <header> is swapped in fresh on every ClientRouter navigation
-  // (it re-renders per page so `aria-current` tracks the new URL), so its
-  // element-specific listeners have to be rebound each time. Document/window
-  // listeners are attached once at the bottom and look up elements fresh at
-  // event time instead of closing over references that go stale on swap.
+  const bookmarksLink = document.getElementById('bookmarks-link');
+  const bookmarkCount = document.getElementById('bookmark-count');
+  const desktopSearch = document.getElementById('desktop-search');
+  const desktopSearchForm = document.getElementById('desktop-search-form');
+  const searchToggle = document.getElementById('search-toggle');
+  const searchToggleIcon = document.getElementById('search-toggle-icon');
+  const siteSearchInput = document.getElementById('site-search') as HTMLInputElement | null;
 
   function setSearchOpen(open: boolean, returnFocus = false) {
-    const desktopSearchForm = document.getElementById('desktop-search-form');
-    const searchToggle = document.getElementById('search-toggle');
-    const searchToggleIcon = document.getElementById('search-toggle-icon');
-    const siteSearchInput = document.getElementById('site-search') as HTMLInputElement | null;
     if (!desktopSearchForm || !searchToggle) return;
 
     desktopSearchForm.classList.toggle('w-0', !open);
@@ -212,9 +210,27 @@ function isActive(href: string): boolean {
     }
   }
 
+  searchToggle?.addEventListener('click', () => {
+    setSearchOpen(searchToggle.getAttribute('aria-expanded') !== 'true');
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && searchToggle?.getAttribute('aria-expanded') === 'true') {
+      setSearchOpen(false, true);
+    }
+  });
+
+  document.addEventListener('click', (event) => {
+    if (
+      searchToggle?.getAttribute('aria-expanded') === 'true'
+      && event.target instanceof Node
+      && !desktopSearch?.contains(event.target)
+    ) {
+      setSearchOpen(false);
+    }
+  });
+
   function syncBookmarkCount() {
-    const bookmarksLink = document.getElementById('bookmarks-link');
-    const bookmarkCount = document.getElementById('bookmark-count');
     const count = getBookmarks().length;
 
     if (bookmarkCount) {
@@ -226,56 +242,21 @@ function isActive(href: string): boolean {
     bookmarksLink?.setAttribute('aria-label', `View bookmarks (${count} saved)`);
   }
 
-  function initHeader() {
-    const searchToggle = document.getElementById('search-toggle');
-    if (searchToggle && !searchToggle.dataset.headerInit) {
-      searchToggle.dataset.headerInit = 'true';
-      searchToggle.addEventListener('click', () => {
-        setSearchOpen(searchToggle.getAttribute('aria-expanded') !== 'true');
-      });
-    }
-
-    const mobileBtn = document.getElementById('mobile-menu-btn');
-    if (mobileBtn && !mobileBtn.dataset.headerInit) {
-      mobileBtn.dataset.headerInit = 'true';
-      mobileBtn.addEventListener('click', () => {
-        const mobileMenu = document.getElementById('mobile-menu');
-        const isOpen = mobileMenu?.classList.contains('hidden') === false;
-        mobileMenu?.classList.toggle('hidden');
-        mobileBtn.setAttribute('aria-expanded', String(!isOpen));
-        mobileBtn.innerHTML = !isOpen
-          ? '<span class="material-symbols-outlined" aria-hidden="true">close</span>'
-          : '<span class="material-symbols-outlined" aria-hidden="true">menu</span>';
-      });
-    }
-
-    syncBookmarkCount();
-  }
-
-  initHeader();
-  document.addEventListener('astro:page-load', initHeader);
-
-  document.addEventListener('keydown', (event) => {
-    const searchToggle = document.getElementById('search-toggle');
-    if (event.key === 'Escape' && searchToggle?.getAttribute('aria-expanded') === 'true') {
-      setSearchOpen(false, true);
-    }
-  });
-
-  document.addEventListener('click', (event) => {
-    const searchToggle = document.getElementById('search-toggle');
-    const desktopSearch = document.getElementById('desktop-search');
-    if (
-      searchToggle?.getAttribute('aria-expanded') === 'true'
-      && event.target instanceof Node
-      && !desktopSearch?.contains(event.target)
-    ) {
-      setSearchOpen(false);
-    }
-  });
-
+  syncBookmarkCount();
   window.addEventListener(BOOKMARKS_CHANGED_EVENT, syncBookmarkCount);
   window.addEventListener('storage', (event) => {
     if (event.key === 'wdf:bookmarks') syncBookmarkCount();
+  });
+
+  const mobileBtn = document.getElementById('mobile-menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+
+  mobileBtn?.addEventListener('click', () => {
+    const isOpen = mobileMenu?.classList.contains('hidden') === false;
+    mobileMenu?.classList.toggle('hidden');
+    mobileBtn.setAttribute('aria-expanded', String(!isOpen));
+    mobileBtn.innerHTML = !isOpen
+      ? '<span class="material-symbols-outlined" aria-hidden="true">close</span>'
+      : '<span class="material-symbols-outlined" aria-hidden="true">menu</span>';
   });
 </script>
