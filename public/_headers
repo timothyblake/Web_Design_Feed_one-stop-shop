@@ -1,5 +1,5 @@
-# 'unsafe-inline' on script-src covers the tiny inline FOUC-prevention
-# script in MainHead.astro. Tighten this with Astro's experimental CSP
+# 'unsafe-inline' on script-src permits inline JSON-LD structured-data
+# blocks. Tighten this with Astro's experimental CSP
 # (auto-hashed inline scripts) once it stabilizes further:
 # https://docs.astro.build/en/guides/security/#experimental-csp-support
 /*

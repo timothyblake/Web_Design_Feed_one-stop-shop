@@ -15,27 +15,27 @@ const year = new Date().getFullYear();
     >
       <a
         href="/feeds/"
-        class="text-sm text-on-surface-variant hover:text-primary dark:hover:text-inverse-on-surface transition-colors"
+        class="text-sm text-on-surface-variant hover:text-secondary transition-colors"
         >RSS Feeds</a
       >
       <!-- <a
         href="/rss.xml"
-        class="text-sm text-on-surface-variant hover:text-primary dark:hover:text-inverse-on-surface transition-colors"
+        class="text-sm text-on-surface-variant hover:text-secondary transition-colors"
         >RSS</a
       >
       <a
         href="/featured.xml"
-        class="text-sm text-on-surface-variant hover:text-primary dark:hover:text-inverse-on-surface transition-colors"
+        class="text-sm text-on-surface-variant hover:text-secondary transition-colors"
         >Featured RSS</a
       > -->
       <a
         href="/newsletter/"
-        class="text-sm text-on-surface-variant hover:text-primary dark:hover:text-inverse-on-surface transition-colors"
+        class="text-sm text-on-surface-variant hover:text-secondary transition-colors"
         >Newsletter</a
       >
       <a
         href="/about/"
-        class="text-sm text-on-surface-variant hover:text-primary dark:hover:text-inverse-on-surface transition-colors"
+        class="text-sm text-on-surface-variant hover:text-secondary transition-colors"
         >About</a
       >
     </nav>
@@ -43,8 +43,7 @@ const year = new Date().getFullYear();
     <p
       class="font-body-md text-sm text-primary dark:text-inverse-on-surface text-center md:text-left"
     >
-      © {year}
-      {SITE_TITLE}. Built for design-minded engineers.
+      {`© ${year} ${SITE_TITLE}. Built for design-minded engineers.`}
     </p>
   </div>
 </footer>

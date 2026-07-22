@@ -1,8 +1,7 @@
 @import "tailwindcss";
 
-/* Class-based dark mode: <html class="dark"> is toggled by the inline
-   FOUC-prevention script in MainHead.astro, and re-applied on
-   astro:after-swap so it survives ClientRouter navigations. */
+/* Legacy dark utilities remain inert unless a `.dark` class is added
+   manually. The application itself is intentionally light-only. */
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ---------------------------------------------------------------------

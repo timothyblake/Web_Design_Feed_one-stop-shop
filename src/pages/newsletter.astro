@@ -12,14 +12,12 @@ import PageHeading from '../components/ui/PageHeading.astro';
   <Breadcrumb items={[{ label: 'Newsletter', href: '/newsletter/' }]} />
 
   <PageHeading>The Weekly Digest</PageHeading>
-  <p class="text-on-surface-variant mb-stack-lg max-w-prose leading-relaxed">
+  <p class="text-on-surface-variant mb-stack-lg leading-relaxed">
     Once a week, we round up the <a href="/featured/" class="underline hover:text-primary dark:hover:text-inverse-on-surface">editor's picks</a>
     from the site into a single email. No algorithm, no noise — just the stories worth your Friday coffee.
   </p>
 
-  <div class="max-w-md">
-    <NewsletterCTA />
-  </div>
+  <NewsletterCTA />
 
   <section class="mt-stack-lg" aria-labelledby="past-issues-heading">
     <h2 id="past-issues-heading" class="font-headline-md font-bold text-primary dark:text-inverse-on-surface text-lg mb-2">

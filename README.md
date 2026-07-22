@@ -41,7 +41,7 @@ The project is built with Astro, TypeScript, and Tailwind CSS. Stories are store
 - Dedicated all-stories and featured-only RSS feeds.
 - Buttondown newsletter subscription and archive links.
 - Responsive desktop sidebar and mobile burger navigation.
-- Light and dark themes stored in `localStorage`.
+- A consistent light-only visual theme.
 - Canonical URLs, Open Graph metadata, Twitter cards, JSON-LD, a sitemap, robots rules, and `llms.txt`.
 - Cloudflare static asset configuration, security headers, and long-lived caching for fingerprinted assets.
 - Reduced-motion support, visible keyboard focus, semantic landmarks, skip navigation, and accessible control labels.
@@ -182,13 +182,13 @@ The site is configured with a canonical production origin of `https://webdesignf
 
 `src/layouts/BaseLayout.astro` provides the document shell:
 
-1. `MainHead.astro` creates metadata, feed discovery links, fonts, structured data, and the initial theme script.
-2. `Header.astro` renders centered desktop navigation, expandable search, the theme control, the bookmark count, and mobile navigation.
+1. `MainHead.astro` creates metadata, feed discovery links, fonts, and structured data.
+2. `Header.astro` renders centered desktop navigation, expandable search, the bookmark count, and mobile navigation.
 3. `SideNav.astro` renders category filtering and the compact subscription card on desktop.
 4. The route's content is rendered inside the main landmark.
 5. `Footer.astro` renders feed and informational links.
 
-The category sidebar is enabled by default. Individual pages can opt out with `showSideNav={false}`; this is currently used for tag archives and the 404 page.
+The category sidebar is enabled by default. Individual pages can opt out with `showSideNav={false}` when needed.
 
 ### Story cards
 
@@ -417,7 +417,7 @@ Important tokens include:
 - `primary` and `on-surface-variant` for text.
 - `secondary` for the pink brand accent.
 - `outline` and `outline-variant` for dividers and controls.
-- `inverse-surface` and `inverse-on-surface` for dark mode.
+- `inverse-surface` and `inverse-on-surface` as retained palette tokens.
 - `--font-headline` using PT Serif.
 - `--font-body` using Geist.
 - Shared gutter, stack, and maximum-container values.
@@ -430,7 +430,7 @@ Responsive behavior:
 - The mobile menu has a viewport-relative maximum height and scrolls on shorter devices.
 - Main content fills the remaining width and uses consistent shared heading dividers.
 
-Dark mode is class-based. The initial theme script runs in the document head to avoid a flash of the wrong theme. It uses a saved `theme` value when present and otherwise follows `prefers-color-scheme`.
+The site uses a fixed light theme and does not change its palette based on browser or operating-system preferences.
 
 ## Accessibility
 
@@ -447,7 +447,7 @@ The interface includes:
 - Visible `:focus-visible` styles.
 - Proper input labels, including visually hidden labels where appropriate.
 - Reduced animation when `prefers-reduced-motion: reduce` is enabled.
-- Theme-aware contrast and focus treatments.
+- High-contrast text and focus treatments.
 
 When adding a new interaction, preserve keyboard operation and update ARIA state at the same time as visual state.
 
@@ -515,7 +515,7 @@ Security headers include:
 - A restrictive Permissions Policy.
 - A Content Security Policy limiting scripts, styles, fonts, images, connections, framing, and form submission.
 
-The current CSP permits inline scripts because the early theme script must run before paint. If Astro's automatic CSP hashing becomes suitable for the project, this allowance can be tightened.
+The current CSP permits inline scripts for the generated JSON-LD structured-data blocks. If Astro's automatic CSP hashing becomes suitable for the project, this allowance can be tightened.
 
 Caching rules:
 
@@ -540,14 +540,13 @@ Recommended manual checks:
 2. Check desktop, tablet, and mobile widths.
 3. Open and close the desktop search with mouse and keyboard.
 4. Open the mobile menu and verify it scrolls on a short viewport.
-5. Toggle light and dark modes, then reload to confirm persistence.
-6. Add and remove a bookmark; verify the header count and Bookmarks page update.
-7. Open and dismiss the share menu.
-8. Confirm only featured stories show the brand-colored star.
-9. Navigate entirely by keyboard and inspect focus visibility.
-10. Test reduced motion through the operating system or browser emulation.
-11. Preview the production build and perform a real Pagefind search.
-12. Validate the RSS feeds and inspect canonical/social metadata.
+5. Add and remove a bookmark; verify the header count and Bookmarks page update.
+6. Open and dismiss the share menu.
+7. Confirm only featured stories show the brand-colored star.
+8. Navigate entirely by keyboard and inspect focus visibility.
+9. Test reduced motion through the operating system or browser emulation.
+10. Preview the production build and perform a real Pagefind search.
+11. Validate the RSS feeds and inspect canonical/social metadata.
 
 At the time this README was written, `astro check` reports no errors. It does report existing informational deprecation hints from Astro's content-schema compatibility surface and an unused `SITE_LOGO` import in the footer; these do not currently fail the build.
 
@@ -595,10 +594,6 @@ Bookmarks are stored only in `localStorage`. Check that the same browser profile
 ### The bookmark count does not update in another tab
 
 Both pages must use the same origin and storage partition. The project listens for the native `storage` event, which is emitted in other tabs after a storage change.
-
-### Dark mode flashes or resets
-
-Check that the inline theme script in `MainHead.astro` is present and permitted by the deployed CSP. Also inspect the stored `theme` key in browser storage.
 
 ### Newsletter submissions fail
 

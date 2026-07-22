@@ -1,7 +1,9 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumb from '../components/ui/Breadcrumb.astro';
 import PageHeading from '../components/ui/PageHeading.astro';
+import aboutImage from '../assets/about-web-design-feed.png';
 import { SITE_TITLE, SITE_URL, SITE_LOGO, TWITTER_HANDLE } from '../consts';
 
 const jsonLd = {
@@ -27,7 +29,7 @@ const jsonLd = {
 
   <PageHeading>About {SITE_TITLE}</PageHeading>
 
-  <div class="prose max-w-none text-on-surface-variant leading-relaxed flex flex-col gap-4">
+  <div class="prose max-w-none text-on-surface-variant leading-7 flex flex-col gap-5">
     <p>
       {SITE_TITLE} is a curated feed of the best UI design, front-end and back-end development stories from
       around the web. Every post links straight to the original article — this is a reading list, not a
@@ -35,13 +37,41 @@ const jsonLd = {
     </p>
     <p>
       Stories are hand-picked from a rotating list of industry sources, added in under a minute the moment
-      they're worth sharing. The best ones get flagged <a href="/featured/" class="underline hover:text-primary dark:hover:text-inverse-on-surface">Featured</a>
+      they're worth sharing. The best ones get flagged <a href="/featured/" class="underline hover:text-primary dark:hover:text-inverse-on-surface">Featured</a>{' '}
       and rolled into the <a href="/newsletter/" class="underline hover:text-primary dark:hover:text-inverse-on-surface">weekly newsletter</a>.
     </p>
     <p>
-      Prefer to read elsewhere? Subscribe via <a href="/rss.xml" class="underline hover:text-primary dark:hover:text-inverse-on-surface">RSS</a>
-      for everything, or <a href="/featured.xml" class="underline hover:text-primary dark:hover:text-inverse-on-surface">the featured-only feed</a>
-      for just the best-of.
+      Prefer to read elsewhere? Visit the <a href="/feeds/" class="underline hover:text-primary dark:hover:text-inverse-on-surface">RSS feeds page</a>{' '}
+      to subscribe to every story or just the featured highlights.
     </p>
+
+    <section class="flex flex-col gap-2 pt-2" aria-labelledby="about-creator-heading">
+      <h2 id="about-creator-heading" class="font-headline-md font-bold text-primary text-lg">
+        Who’s behind it
+      </h2>
+      <p>
+        Web Design Feed was created and is curated by Timothy Blake, a front-end developer with a passion
+        for useful, well-crafted digital experiences.
+      </p>
+    </section>
+
+    <section class="flex flex-col gap-2" aria-labelledby="about-purpose-heading">
+      <h2 id="about-purpose-heading" class="font-headline-md font-bold text-primary text-lg">
+        Why it exists
+      </h2>
+      <p>
+        Web Design Feed is a one-stop shop for the articles, ideas, and tools you need to keep up with web
+        development and design. The site is updated weekly with fresh, carefully selected stories.
+      </p>
+    </section>
   </div>
+
+  <Image
+    src={aboutImage}
+    alt="Web Design Feed illustration showing its curated article interface, categories, search, bookmarks, RSS, and sharing controls."
+    widths={[480, 768, 1024, 1536]}
+    sizes="(min-width: 1280px) 960px, (min-width: 1024px) calc(100vw - 24rem), calc(100vw - 3rem)"
+    layout="constrained"
+    class="mt-8 w-full rounded-2xl border border-outline-variant"
+  />
 </BaseLayout>

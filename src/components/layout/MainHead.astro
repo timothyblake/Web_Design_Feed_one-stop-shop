@@ -50,8 +50,7 @@ const schemas = structuredData ? (Array.isArray(structuredData) ? structuredData
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
 <meta name="apple-mobile-web-app-title" content={SITE_TITLE} />
 <link rel="manifest" href="/site.webmanifest" />
-<meta name="theme-color" content="#f4ede1" media="(prefers-color-scheme: light)" />
-<meta name="theme-color" content="#2d2926" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#f4ede1" />
 
 <!-- Open Graph -->
 <meta property="og:type" content={ogType} />
@@ -88,19 +87,3 @@ const schemas = structuredData ? (Array.isArray(structuredData) ? structuredData
 {schemas.map((schema) => (
   <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
 ))}
-
-<!-- Theme FOUC prevention: must run before first paint. Re-applied on
-     astro:after-swap because inline head scripts don't re-run across
-     ClientRouter (view transition) navigations. -->
-<script is:inline>
-  (function () {
-    function applyTheme() {
-      var stored = localStorage.getItem('theme');
-      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      var isDark = stored ? stored === 'dark' : prefersDark;
-      document.documentElement.classList.toggle('dark', isDark);
-    }
-    applyTheme();
-    document.addEventListener('astro:after-swap', applyTheme);
-  })();
-</script>
