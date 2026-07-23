@@ -61,7 +61,9 @@ const { activeCategory } = Astro.props;
     }
   </nav>
 
-  <div class="mt-auto pt-6 shadow-[inset_0_1px_0_rgba(0,0,0,0.15),0_-1px_0_rgba(255,255,255,0.8)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_-1px_0_rgba(0,0,0,0.5)]">
+  <div
+    class="mt-auto pt-6 shadow-[inset_0_1px_0_rgba(0,0,0,0.15),0_-1px_0_rgba(255,255,255,0.8)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_-1px_0_rgba(0,0,0,0.5)]"
+  >
     <div
       class="rounded-xl bg-white dark:bg-inverse-surface p-4 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.15),0_0_0_1px_rgba(255,255,255,0.8)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1),0_0_0_1px_rgba(0,0,0,0.5)]"
     >
@@ -82,7 +84,7 @@ const { activeCategory } = Astro.props;
         Join newsletter
       </a>
       <a
-        href="/rss.xml"
+        href="/feeds/"
         data-astro-reload
         class="block text-center w-full border border-outline text-primary dark:text-inverse-on-surface font-label-md text-sm py-2 rounded-lg hover:bg-surface-variant transition-all font-semibold mt-2"
       >
