@@ -34,9 +34,6 @@ import ViewToggle from '../components/ui/ViewToggle.astro';
   import { categoryLabel, categoryPillClass } from '../consts';
   import { relativeTime, formatDate } from '../utils/formatDate';
 
-  const list = document.getElementById('bookmarks-list');
-  const emptyState = document.getElementById('bookmarks-empty');
-
   function sourceInitials(source: string): string {
     return source
       .split(' ')
@@ -141,11 +138,17 @@ import ViewToggle from '../components/ui/ViewToggle.astro';
   }
 
   function renderEmptyState() {
+    const list = document.getElementById('bookmarks-list');
+    const emptyState = document.getElementById('bookmarks-empty');
     const isEmpty = list?.children.length === 0;
     emptyState?.classList.toggle('hidden', !isEmpty);
   }
 
+  // Re-queries the list each call (rather than closing over a module-level
+  // const) because ClientRouter swaps in a brand-new #bookmarks-list element
+  // on every navigation back to this page — the old reference would be stale.
   function render() {
+    const list = document.getElementById('bookmarks-list');
     if (!list) return;
     list.innerHTML = '';
     for (const item of getBookmarks()) {
@@ -155,4 +158,5 @@ import ViewToggle from '../components/ui/ViewToggle.astro';
   }
 
   render();
+  document.addEventListener('astro:page-load', render);
 </script>

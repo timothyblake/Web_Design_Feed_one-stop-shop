@@ -179,15 +179,17 @@ function isActive(href: string): boolean {
 <script>
   import { BOOKMARKS_CHANGED_EVENT, getBookmarks } from '../../lib/bookmarks-client';
 
-  const bookmarksLink = document.getElementById('bookmarks-link');
-  const bookmarkCount = document.getElementById('bookmark-count');
-  const desktopSearch = document.getElementById('desktop-search');
-  const desktopSearchForm = document.getElementById('desktop-search-form');
-  const searchToggle = document.getElementById('search-toggle');
-  const searchToggleIcon = document.getElementById('search-toggle-icon');
-  const siteSearchInput = document.getElementById('site-search') as HTMLInputElement | null;
+  // The whole <header> is swapped in fresh on every ClientRouter navigation
+  // (it re-renders per page so `aria-current` tracks the new URL), so its
+  // element-specific listeners have to be rebound each time. Document/window
+  // listeners are attached once at the bottom and look up elements fresh at
+  // event time instead of closing over references that go stale on swap.
 
   function setSearchOpen(open: boolean, returnFocus = false) {
+    const desktopSearchForm = document.getElementById('desktop-search-form');
+    const searchToggle = document.getElementById('search-toggle');
+    const searchToggleIcon = document.getElementById('search-toggle-icon');
+    const siteSearchInput = document.getElementById('site-search') as HTMLInputElement | null;
     if (!desktopSearchForm || !searchToggle) return;
 
     desktopSearchForm.classList.toggle('w-0', !open);
@@ -210,27 +212,9 @@ function isActive(href: string): boolean {
     }
   }
 
-  searchToggle?.addEventListener('click', () => {
-    setSearchOpen(searchToggle.getAttribute('aria-expanded') !== 'true');
-  });
-
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && searchToggle?.getAttribute('aria-expanded') === 'true') {
-      setSearchOpen(false, true);
-    }
-  });
-
-  document.addEventListener('click', (event) => {
-    if (
-      searchToggle?.getAttribute('aria-expanded') === 'true'
-      && event.target instanceof Node
-      && !desktopSearch?.contains(event.target)
-    ) {
-      setSearchOpen(false);
-    }
-  });
-
   function syncBookmarkCount() {
+    const bookmarksLink = document.getElementById('bookmarks-link');
+    const bookmarkCount = document.getElementById('bookmark-count');
     const count = getBookmarks().length;
 
     if (bookmarkCount) {
@@ -242,21 +226,59 @@ function isActive(href: string): boolean {
     bookmarksLink?.setAttribute('aria-label', `View bookmarks (${count} saved)`);
   }
 
-  syncBookmarkCount();
+  function initHeader() {
+    const searchToggle = document.getElementById('search-toggle');
+    const mobileBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    if (!searchToggle?.dataset.searchInit) {
+      searchToggle?.setAttribute('data-search-init', 'true');
+      searchToggle?.addEventListener('click', () => {
+        setSearchOpen(searchToggle.getAttribute('aria-expanded') !== 'true');
+      });
+    }
+
+    if (!mobileBtn?.dataset.mobileInit) {
+      mobileBtn?.setAttribute('data-mobile-init', 'true');
+      mobileBtn?.addEventListener('click', () => {
+        const isOpen = mobileMenu?.classList.contains('hidden') === false;
+        mobileMenu?.classList.toggle('hidden');
+        mobileBtn.setAttribute('aria-expanded', String(!isOpen));
+        mobileBtn.innerHTML = !isOpen
+          ? '<span class="material-symbols-outlined" aria-hidden="true">close</span>'
+          : '<span class="material-symbols-outlined" aria-hidden="true">menu</span>';
+      });
+    }
+
+    syncBookmarkCount();
+  }
+
+  initHeader();
+  document.addEventListener('astro:page-load', initHeader);
+
+  // Document/window listeners: the targets they check are looked up fresh
+  // each time, so these are safe to register exactly once and never rebind.
+  document.addEventListener('keydown', (event) => {
+    const searchToggle = document.getElementById('search-toggle');
+    if (event.key === 'Escape' && searchToggle?.getAttribute('aria-expanded') === 'true') {
+      setSearchOpen(false, true);
+    }
+  });
+
+  document.addEventListener('click', (event) => {
+    const desktopSearch = document.getElementById('desktop-search');
+    const searchToggle = document.getElementById('search-toggle');
+    if (
+      searchToggle?.getAttribute('aria-expanded') === 'true'
+      && event.target instanceof Node
+      && !desktopSearch?.contains(event.target)
+    ) {
+      setSearchOpen(false);
+    }
+  });
+
   window.addEventListener(BOOKMARKS_CHANGED_EVENT, syncBookmarkCount);
   window.addEventListener('storage', (event) => {
     if (event.key === 'wdf:bookmarks') syncBookmarkCount();
-  });
-
-  const mobileBtn = document.getElementById('mobile-menu-btn');
-  const mobileMenu = document.getElementById('mobile-menu');
-
-  mobileBtn?.addEventListener('click', () => {
-    const isOpen = mobileMenu?.classList.contains('hidden') === false;
-    mobileMenu?.classList.toggle('hidden');
-    mobileBtn.setAttribute('aria-expanded', String(!isOpen));
-    mobileBtn.innerHTML = !isOpen
-      ? '<span class="material-symbols-outlined" aria-hidden="true">close</span>'
-      : '<span class="material-symbols-outlined" aria-hidden="true">menu</span>';
   });
 </script>
