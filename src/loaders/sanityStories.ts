@@ -1,5 +1,6 @@
 import type { Loader } from 'astro/loaders';
 import { createClient } from '@sanity/client';
+import { normalizeCategorySlug } from '../consts';
 
 // GROQ projection mirrors the `story` fields consumed across the site
 // (StoryCard, category/tag pages, RSS, llms.txt) so the Content Layer
@@ -48,7 +49,13 @@ export function sanityStoriesLoader(): Loader {
       for (const story of stories) {
         const { _id, _updatedAt, ...rest } = story;
         const id = String(_id);
-        const data = await parseData({ id, data: rest });
+        const data = await parseData({
+          id,
+          data: {
+            ...rest,
+            category: normalizeCategorySlug(String(rest.category ?? '')),
+          },
+        });
         store.set({ id, data, digest: generateDigest(story) });
       }
 

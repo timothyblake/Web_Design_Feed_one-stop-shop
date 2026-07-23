@@ -9,11 +9,11 @@ const { activeCategory } = Astro.props;
 ---
 
 <aside
-  class="hidden lg:flex flex-col gap-stack-md py-stack-lg w-64 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto pr-gutter shadow-[inset_-1px_0_0_rgba(0,0,0,0.15),1px_0_0_rgba(255,255,255,0.8)] dark:shadow-[inset_-1px_0_0_rgba(255,255,255,0.1),1px_0_0_rgba(0,0,0,0.5)]"
+  class="hidden lg:flex flex-col gap-stack-md py-stack-lg w-64 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto pr-gutter shadow-[inset_-1px_0_0_rgba(0,0,0,0.15),1px_0_0_rgba(255,255,255,0.8)]"
 >
   <div class="px-3 mb-2">
     <h2
-      class="font-headline-lg text-[22px] font-bold text-primary dark:text-inverse-on-surface"
+      class="font-headline-lg text-[22px] font-bold text-primary"
     >
       Categories
     </h2>
@@ -29,7 +29,7 @@ const { activeCategory } = Astro.props;
       class={`rounded-xl p-3 font-label-md text-label-md flex items-center gap-3 transition-colors ${
         !activeCategory
           ? "bg-secondary text-on-secondary font-bold shadow-sm"
-          : "text-primary dark:text-inverse-on-surface hover:bg-surface-variant font-semibold"
+          : "text-primary hover:bg-surface-variant font-semibold"
       }`}
     >
       <span class="material-symbols-outlined text-[20px]" aria-hidden="true"
@@ -45,7 +45,7 @@ const { activeCategory } = Astro.props;
           class={`rounded-xl p-3 font-label-md text-label-md flex items-center gap-3 transition-colors ${
             activeCategory === category.slug
               ? "bg-secondary text-on-secondary font-bold shadow-sm"
-              : "text-primary dark:text-inverse-on-surface hover:bg-surface-variant font-semibold"
+              : "text-primary hover:bg-surface-variant font-semibold"
           }`}
         >
           <span
@@ -62,13 +62,13 @@ const { activeCategory } = Astro.props;
   </nav>
 
   <div
-    class="mt-auto pt-6 shadow-[inset_0_1px_0_rgba(0,0,0,0.15),0_-1px_0_rgba(255,255,255,0.8)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_-1px_0_rgba(0,0,0,0.5)]"
+    class="mt-auto pt-6 shadow-[inset_0_1px_0_rgba(0,0,0,0.15),0_-1px_0_rgba(255,255,255,0.8)]"
   >
     <div
-      class="rounded-xl bg-white dark:bg-inverse-surface p-4 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.15),0_0_0_1px_rgba(255,255,255,0.8)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1),0_0_0_1px_rgba(0,0,0,0.5)]"
+      class="rounded-xl bg-white p-4 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.15),0_0_0_1px_rgba(255,255,255,0.8)]"
     >
       <h3
-        class="font-headline-md font-bold text-primary dark:text-inverse-on-surface mb-2"
+        class="font-headline-md font-bold text-primary mb-2"
       >
         Subscribe
       </h3>
@@ -86,7 +86,7 @@ const { activeCategory } = Astro.props;
       <a
         href="/feeds"
         data-astro-reload
-        class="block text-center w-full border border-outline text-primary dark:text-inverse-on-surface font-label-md text-sm py-2 rounded-lg hover:bg-surface-variant transition-all font-semibold mt-2"
+        class="block text-center w-full border border-outline text-primary font-label-md text-sm py-2 rounded-lg hover:bg-surface-variant transition-all font-semibold mt-2"
       >
         Subscribe to RSS
       </a>

@@ -19,13 +19,13 @@ function isActive(href: string): boolean {
 ---
 
 <header
-  class="bg-surface dark:bg-inverse-surface sticky top-0 border-b border-[#dee2e6] dark:border-outline-variant z-50 transition-colors duration-300"
+  class="bg-surface sticky top-0 border-b border-[#dee2e6] z-50"
 >
   <div class="grid grid-cols-[auto_1fr_auto] md:grid-cols-[1fr_auto_1fr] items-center px-gutter w-full h-16 max-w-container-max mx-auto">
     <div class="contents md:flex md:items-center md:gap-stack-lg md:justify-self-start">
       <button
         id="mobile-menu-btn"
-        class="md:hidden text-primary dark:text-inverse-on-surface p-2 -ml-2 rounded-lg hover:bg-surface-variant transition-colors"
+        class="md:hidden text-primary p-2 -ml-2 rounded-lg hover:bg-surface-variant transition-colors"
         aria-label="Toggle menu"
         aria-expanded="false"
         aria-controls="mobile-menu"
@@ -34,7 +34,7 @@ function isActive(href: string): boolean {
       </button>
 
       <a href="/" class="flex items-center justify-self-center md:justify-self-auto gap-2" aria-label={SITE_TITLE}>
-        <img src={SITE_LOGO} alt={SITE_TITLE} class="h-7 md:h-6 w-auto object-contain dark:invert" width="160" height="24" />
+        <img src={SITE_LOGO} alt={SITE_TITLE} class="h-7 md:h-6 w-auto object-contain" width="160" height="24" />
       </a>
     </div>
 
@@ -45,7 +45,7 @@ function isActive(href: string): boolean {
           aria-current={isActive(link.href) ? 'page' : undefined}
           class={`font-label-md text-label-md px-3 py-1.5 rounded-md transition-colors hover:text-secondary ${
             isActive(link.href)
-              ? 'text-primary dark:text-inverse-on-surface font-bold'
+              ? 'text-primary font-bold'
               : 'text-on-surface-variant'
           }`}
         >
@@ -71,13 +71,13 @@ function isActive(href: string): boolean {
             type="search"
             name="q"
             placeholder="Search..."
-            class="w-64 shrink-0 pl-4 pr-4 py-1.5 rounded-xl border border-[#dee2e6] dark:border-outline-variant bg-transparent text-body-md text-primary dark:text-inverse-on-surface focus:outline-none focus-visible:ring-1 focus-visible:ring-outline placeholder:text-on-surface-variant"
+            class="w-64 shrink-0 pl-4 pr-4 py-1.5 rounded-xl border border-[#dee2e6] bg-transparent text-body-md text-primary focus:outline-none focus-visible:ring-1 focus-visible:ring-outline placeholder:text-on-surface-variant"
           />
         </form>
         <button
           id="search-toggle"
           type="button"
-          class="text-primary dark:text-inverse-on-surface p-2 rounded-full hover:bg-surface-variant transition-colors"
+          class="text-primary p-2 rounded-full hover:bg-surface-variant transition-colors"
           aria-label="Open search"
           aria-expanded="false"
           aria-controls="desktop-search-form"
@@ -90,7 +90,7 @@ function isActive(href: string): boolean {
         id="bookmarks-link"
         href="/bookmarks"
         aria-current={isActive('/bookmarks/') ? 'page' : undefined}
-        class="relative -mr-2 md:mr-0 text-primary dark:text-inverse-on-surface p-2 rounded-full hover:bg-surface-variant transition-colors"
+        class="relative -mr-2 md:mr-0 text-primary p-2 rounded-full hover:bg-surface-variant transition-colors"
         aria-label="View bookmarks"
       >
         <span class="material-symbols-outlined block" aria-hidden="true">bookmark</span>
@@ -106,7 +106,7 @@ function isActive(href: string): boolean {
 
   <div
     id="mobile-menu"
-    class="hidden md:hidden absolute top-full left-0 w-full max-h-[calc(100vh-4rem)] overflow-y-auto bg-surface dark:bg-inverse-surface border-b border-[#dee2e6] dark:border-outline-variant shadow-lg transition-all duration-300 origin-top"
+    class="hidden md:hidden absolute top-full left-0 w-full max-h-[calc(100vh-4rem)] overflow-y-auto bg-surface border-b border-[#dee2e6] shadow-lg transition-all duration-300 origin-top"
   >
     <nav aria-label="Mobile" class="flex flex-col p-4 gap-2">
       <form action="/search" method="get" class="relative w-full mb-4" role="search">
@@ -116,12 +116,12 @@ function isActive(href: string): boolean {
           type="search"
           name="q"
           placeholder="Search articles..."
-          class="w-full pl-4 pr-4 py-2 rounded-lg border border-[#dee2e6] dark:border-outline-variant bg-transparent text-body-md text-primary dark:text-inverse-on-surface focus:outline-none"
+          class="w-full pl-4 pr-4 py-2 rounded-lg border border-[#dee2e6] bg-transparent text-body-md text-primary focus:outline-none"
         />
       </form>
 
-      <div class="mb-3 pb-4 border-b border-[#dee2e6] dark:border-outline-variant">
-        <h2 class="px-3 mb-2 text-label-md font-bold text-primary dark:text-inverse-on-surface">
+      <div class="mb-3 pb-4 border-b border-[#dee2e6]">
+        <h2 class="px-3 mb-2 text-label-md font-bold text-primary">
           Categories
         </h2>
         <div class="flex flex-col gap-1">
@@ -134,7 +134,7 @@ function isActive(href: string): boolean {
                 aria-current={isActive(href) ? 'page' : undefined}
                 class={`p-3 rounded-lg flex items-center gap-3 transition-colors ${
                   isActive(href)
-                    ? 'font-bold text-primary dark:text-inverse-on-surface bg-surface-variant'
+                    ? 'font-bold text-primary bg-surface-variant'
                     : 'text-on-surface-variant hover:bg-surface-variant'
                 }`}
               >
@@ -154,7 +154,7 @@ function isActive(href: string): boolean {
           aria-current={isActive(link.href) ? 'page' : undefined}
           class={`p-3 rounded-lg transition-colors ${
             isActive(link.href)
-              ? 'font-bold text-primary dark:text-inverse-on-surface bg-surface-variant'
+              ? 'font-bold text-primary bg-surface-variant'
               : 'text-on-surface-variant hover:bg-surface-variant'
           }`}
         >
@@ -166,7 +166,7 @@ function isActive(href: string): boolean {
         aria-current={isActive('/bookmarks/') ? 'page' : undefined}
         class={`p-3 rounded-lg transition-colors ${
           isActive('/bookmarks/')
-            ? 'font-bold text-primary dark:text-inverse-on-surface bg-surface-variant'
+            ? 'font-bold text-primary bg-surface-variant'
             : 'text-on-surface-variant hover:bg-surface-variant'
         }`}
       >

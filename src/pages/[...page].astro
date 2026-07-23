@@ -21,7 +21,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 const { page } = Astro.props as { page: Page<CollectionEntry<'stories'>> };
 
 const title = page.currentPage === 1
-  ? 'Curated UI Design & Development Stories'
+  ? 'Curated UI & UX Design and Development Stories'
   : `Latest Stories — Page ${page.currentPage}`;
 
 // SearchAction only needs to appear once — keep it off paginated pages 2+.
@@ -71,7 +71,7 @@ const jsonLd =
       {page.url.prev ? (
         <a
           href={page.url.prev}
-          class="border border-outline text-primary dark:text-inverse-on-surface font-label-md text-label-md px-5 py-2.5 rounded-lg hover:bg-surface-variant transition-all font-semibold"
+          class="border border-outline text-primary font-label-md text-label-md px-5 py-2.5 rounded-lg hover:bg-surface-variant transition-all font-semibold"
         >
           Previous
         </a>
@@ -99,18 +99,18 @@ const jsonLd =
   {page.currentPage === 1 && (
     <SeoBlurb title={`About ${SITE_TITLE}`}>
       <p>
-        {SITE_TITLE} is a curated feed of the best UI design, front-end and back-end development stories from
-        around the web. Every entry links straight to the original article — this is a reading list, not a
-        republishing platform.
+        {SITE_TITLE} is a curated feed of the best UI and UX design, front-end and back-end development
+        stories from around the web. Every entry links straight to the original article — this is a reading
+        list, not a republishing platform.
       </p>
       <p>
         Stories are hand-picked from a rotating list of industry sources, added the moment they're worth
-        sharing. The best ones get flagged <a href="/featured" class="underline hover:text-primary dark:hover:text-inverse-on-surface">Featured</a>
-        and rolled into the <a href="/newsletter" class="underline hover:text-primary dark:hover:text-inverse-on-surface">weekly newsletter</a>.
+        sharing. The best ones get flagged <a href="/featured" class="underline hover:text-primary">Featured</a>
+        and rolled into the <a href="/newsletter" class="underline hover:text-primary">weekly newsletter</a>.
       </p>
       <p>
-        Browse by <a href="/category/ui-design" class="underline hover:text-primary dark:hover:text-inverse-on-surface">category</a> or
-        subscribe via <a href="/rss.xml" data-astro-reload class="underline hover:text-primary dark:hover:text-inverse-on-surface">RSS</a> to
+        Browse by <a href="/category/ui-ux-design" class="underline hover:text-primary">category</a> or
+        subscribe via <a href="/rss.xml" data-astro-reload class="underline hover:text-primary">RSS</a> to
         follow along without checking back manually.
       </p>
     </SeoBlurb>

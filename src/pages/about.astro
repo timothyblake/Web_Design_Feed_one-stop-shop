@@ -14,7 +14,7 @@ const jsonLd = {
     '@type': 'Organization',
     name: SITE_TITLE,
     url: SITE_URL,
-    logo: SITE_LOGO,
+    logo: new URL(SITE_LOGO, SITE_URL).toString(),
     sameAs: [`https://twitter.com/${TWITTER_HANDLE.replace('@', '')}`],
   },
 };
@@ -37,11 +37,11 @@ const jsonLd = {
     </p>
     <p>
       Stories are hand-picked from a rotating list of industry sources, added in under a minute the moment
-      they're worth sharing. The best ones get flagged <a href="/featured" class="underline hover:text-primary dark:hover:text-inverse-on-surface">Featured</a>{' '}
-      and rolled into the <a href="/newsletter" class="underline hover:text-primary dark:hover:text-inverse-on-surface">weekly newsletter</a>.
+      they're worth sharing. The best ones get flagged <a href="/featured" class="underline hover:text-primary">Featured</a>{' '}
+      and rolled into the <a href="/newsletter" class="underline hover:text-primary">weekly newsletter</a>.
     </p>
     <p>
-      Prefer to read elsewhere? Visit the <a href="/feeds" class="underline hover:text-primary dark:hover:text-inverse-on-surface">RSS feeds page</a>{' '}
+      Prefer to read elsewhere? Visit the <a href="/feeds" class="underline hover:text-primary">RSS feeds page</a>{' '}
       to subscribe to every story or just the featured highlights.
     </p>
 

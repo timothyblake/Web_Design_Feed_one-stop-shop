@@ -30,7 +30,7 @@ Top-level JSON array; each object:
   "url": "string, required, must be a valid URL",
   "description": "string, required, 1–280 chars",
   "source": "string, required",
-  "category": "one of: ui-design | front-end | back-end | tools | career",
+  "category": "one of: ui-ux-design | front-end | back-end | resources | business",
   "tags": ["optional", "array", "of", "strings"],
   "featured": false,
   "publishedAt": "optional ISO date, defaults to now"

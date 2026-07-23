@@ -21,8 +21,7 @@ export async function getStaticPaths() {
   return CATEGORIES.map((category) => ({
     // The URL segment is slugified from the page title, so it only diverges
     // from `category.slug` for categories with a longer page title (e.g.
-    // front-end → front-end-development) — story filtering below still keys
-    // off the original `category.slug`, which is what's stored in Sanity.
+    // front-end → front-end-development).
     params: { slug: categoryUrlSlug(category.slug) },
     props: {
       categorySlug: category.slug,

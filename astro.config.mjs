@@ -31,6 +31,9 @@ export default defineConfig({
     // The front-end category page moved from /category/front-end to
     // /category/front-end-development when its page title changed.
     '/category/front-end': '/category/front-end-development',
+    '/category/ui-design': '/category/ui-ux-design',
+    '/category/career': '/category/business',
+    '/category/tools': '/category/resources',
   },
   integrations: [
     mdx(),
@@ -54,8 +57,8 @@ export default defineConfig({
   },
   fonts: [
     {
-      provider: fontProviders.google(),
-      name: 'PT Serif',
+      provider: fontProviders.fontsource(),
+      name: 'Mona Sans',
       cssVariable: '--font-headline',
       weights: [400, 700],
     },

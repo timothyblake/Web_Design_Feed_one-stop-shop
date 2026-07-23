@@ -42,7 +42,7 @@ const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSe
     // No overflow-hidden here: it would clip the share popover. The hero
     // image's own wrapper below has its own overflow-hidden + rounded-t-xl
     // to keep the image corners flush with the card.
-    'bg-surface dark:bg-inverse-surface border border-[#dee2e6] dark:border-outline-variant rounded-xl p-stack-md hover:bg-surface-variant/50 transition-colors duration-300 flex flex-col gap-2 relative',
+    'bg-surface border border-[#dee2e6] rounded-xl p-stack-md hover:bg-surface-variant/50 transition-colors duration-300 flex flex-col gap-2 relative',
     !priority && 'animate-fade-up',
   ]}
 >
@@ -93,14 +93,14 @@ const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSe
         />
       )}
     </span>
-    <span class="font-label-sm text-label-sm font-bold text-primary dark:text-inverse-on-surface">{source}</span>
+    <span class="font-label-sm text-label-sm font-bold text-primary">{source}</span>
     <span class="text-primary text-[10px] opacity-50" aria-hidden="true">•</span>
     <time datetime={publishedAt.toISOString()} title={formatDate(publishedAt)} class="font-label-sm text-xs text-on-surface-variant">
       {relativeTime(publishedAt)}
     </time>
   </div>
 
-  <h2 class="font-headline-md text-primary dark:text-inverse-on-surface mb-1 line-clamp-2 leading-tight font-bold text-xl">
+  <h2 class="font-headline-md text-primary mb-1 line-clamp-2 leading-tight font-bold text-xl">
     <a
       href={url}
       target="_blank"
@@ -125,7 +125,7 @@ const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSe
     {tags.map((tag) => (
       <a
         href={`/tag/${tag}`}
-        class="text-on-surface-variant font-label-md text-label-md text-xs hover:text-primary dark:hover:text-inverse-on-surface transition-colors"
+        class="text-on-surface-variant font-label-md text-label-md text-xs hover:text-primary transition-colors"
       >
         #{tag}
       </a>
@@ -134,7 +134,7 @@ const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSe
     <div class="ml-auto flex gap-2">
       <button
         type="button"
-        class="bookmark-btn text-primary dark:text-inverse-on-surface hover:text-secondary transition-all"
+        class="bookmark-btn text-primary hover:text-secondary transition-all"
         aria-pressed="false"
         aria-label={`Save "${title}" to bookmarks`}
         data-bookmark-url={url}
@@ -149,7 +149,7 @@ const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSe
       <div class="share-wrapper relative">
         <button
           type="button"
-          class="share-btn text-primary dark:text-inverse-on-surface hover:text-secondary transition-all"
+          class="share-btn text-primary hover:text-secondary transition-all"
           aria-label={`Share "${title}"`}
           aria-haspopup="menu"
           aria-expanded="false"
@@ -161,7 +161,7 @@ const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSe
         </button>
 
         <div
-          class="share-menu hidden absolute right-0 bottom-full mb-2 z-20 w-52 rounded-xl border border-outline bg-background dark:bg-inverse-surface shadow-lg py-1 text-left"
+          class="share-menu hidden absolute right-0 bottom-full mb-2 z-20 w-52 rounded-xl border border-outline bg-background shadow-lg py-1 text-left"
           role="menu"
         >
           <a
@@ -169,7 +169,7 @@ const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSe
             href={twitterShareUrl}
             target="_blank"
             rel="noopener noreferrer"
-            class="flex items-center gap-2 px-3 py-2 text-sm text-primary dark:text-inverse-on-surface hover:bg-surface-variant transition-colors"
+            class="flex items-center gap-2 px-3 py-2 text-sm text-primary hover:bg-surface-variant transition-colors"
           >
             <span class="w-5 h-5 shrink-0 rounded bg-black text-white flex items-center justify-center text-[10px] font-bold" aria-hidden="true">X</span>
             Share on X
@@ -179,7 +179,7 @@ const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSe
             href={linkedInShareUrl}
             target="_blank"
             rel="noopener noreferrer"
-            class="flex items-center gap-2 px-3 py-2 text-sm text-primary dark:text-inverse-on-surface hover:bg-surface-variant transition-colors"
+            class="flex items-center gap-2 px-3 py-2 text-sm text-primary hover:bg-surface-variant transition-colors"
           >
             <span class="w-5 h-5 shrink-0 rounded bg-[#0A66C2] text-white flex items-center justify-center text-[9px] font-bold" aria-hidden="true">in</span>
             Share on LinkedIn
@@ -189,7 +189,7 @@ const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSe
             href={facebookShareUrl}
             target="_blank"
             rel="noopener noreferrer"
-            class="flex items-center gap-2 px-3 py-2 text-sm text-primary dark:text-inverse-on-surface hover:bg-surface-variant transition-colors"
+            class="flex items-center gap-2 px-3 py-2 text-sm text-primary hover:bg-surface-variant transition-colors"
           >
             <span class="w-5 h-5 shrink-0 rounded bg-[#1877F2] text-white flex items-center justify-center text-[11px] font-bold" aria-hidden="true">f</span>
             Share on Facebook
@@ -197,7 +197,7 @@ const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSe
           <button
             type="button"
             role="menuitem"
-            class="share-native-item hidden items-center gap-2 px-3 py-2 text-sm w-full text-left text-primary dark:text-inverse-on-surface hover:bg-surface-variant transition-colors"
+            class="share-native-item hidden items-center gap-2 px-3 py-2 text-sm w-full text-left text-primary hover:bg-surface-variant transition-colors"
             data-share-url={url}
             data-share-title={title}
             data-share-text={description}
@@ -209,7 +209,7 @@ const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSe
           <button
             type="button"
             role="menuitem"
-            class="copy-link-btn flex items-center gap-2 px-3 py-2 text-sm w-full text-left text-primary dark:text-inverse-on-surface hover:bg-surface-variant transition-colors"
+            class="copy-link-btn flex items-center gap-2 px-3 py-2 text-sm w-full text-left text-primary hover:bg-surface-variant transition-colors"
             data-copy-url={url}
           >
             <span class="material-symbols-outlined text-[16px] shrink-0" aria-hidden="true">link</span>

@@ -20,7 +20,7 @@ import path from 'node:path';
 import { createClient } from '@sanity/client';
 
 // Kept in sync with src/consts.ts CATEGORIES and sanity/schemaTypes/story.ts.
-const VALID_CATEGORIES = ['ui-design', 'front-end', 'back-end', 'tools', 'career'];
+const VALID_CATEGORIES = ['ui-ux-design', 'front-end', 'back-end', 'resources', 'business'];
 const REQUIRED_FIELDS = ['title', 'url', 'description', 'source', 'category'];
 
 const inputPath = process.argv[2] ?? 'scripts/stories.example.json';

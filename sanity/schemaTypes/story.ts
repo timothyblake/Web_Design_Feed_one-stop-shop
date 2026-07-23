@@ -3,11 +3,11 @@ import { defineField, defineType } from 'sanity';
 // Kept in sync with the CATEGORIES slugs in src/consts.ts — update both
 // places together if categories ever change.
 const CATEGORY_OPTIONS = [
-  { title: 'UI Design', value: 'ui-design' },
+  { title: 'UI & UX Design', value: 'ui-ux-design' },
   { title: 'Front-end', value: 'front-end' },
   { title: 'Back-end', value: 'back-end' },
-  { title: 'Tools', value: 'tools' },
-  { title: 'Career', value: 'career' },
+  { title: 'Resources', value: 'resources' },
+  { title: 'Business', value: 'business' },
 ];
 
 export default defineType({

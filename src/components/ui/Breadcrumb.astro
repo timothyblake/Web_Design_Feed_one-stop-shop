@@ -31,9 +31,9 @@ const jsonLd = {
       <li class="flex items-center gap-1">
         {i > 0 && <span aria-hidden="true">/</span>}
         {i === allItems.length - 1 ? (
-          <span aria-current="page" class="font-semibold text-primary dark:text-inverse-on-surface">{item.label}</span>
+          <span aria-current="page" class="font-semibold text-primary">{item.label}</span>
         ) : (
-          <a href={item.href} class="hover:text-primary dark:hover:text-inverse-on-surface transition-colors">{item.label}</a>
+          <a href={item.href} class="hover:text-primary transition-colors">{item.label}</a>
         )}
       </li>
     ))}
