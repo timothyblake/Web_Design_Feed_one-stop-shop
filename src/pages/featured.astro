@@ -16,14 +16,14 @@ const stories = (await getCollection('stories', ({ data }) => data.featured)).so
   title="Featured"
   description="Editor's picks — the stories that make it into the weekly newsletter digest."
 >
-  <Breadcrumb items={[{ label: 'Featured', href: '/featured/' }]} />
+  <Breadcrumb items={[{ label: 'Featured', href: '/featured' }]} />
 
   <PageHeading>
     Editor's Picks
     <ViewToggle slot="actions" />
   </PageHeading>
   <p class="text-on-surface-variant mb-stack-md text-sm">
-    The best stories of the week, hand-picked. Powers the <a href="/newsletter/" class="underline hover:text-primary dark:hover:text-inverse-on-surface">weekly digest</a>.
+    The best stories of the week, hand-picked. Powers the <a href="/newsletter" class="underline hover:text-primary dark:hover:text-inverse-on-surface">weekly digest</a>.
   </p>
 
   <ol data-story-list class="flex flex-col gap-stack-md list-none p-0 m-0">

@@ -10,7 +10,7 @@ import ViewToggle from '../components/ui/ViewToggle.astro';
   description="Stories you've saved to read later."
   noindex
 >
-  <Breadcrumb items={[{ label: 'Bookmarks', href: '/bookmarks/' }]} />
+  <Breadcrumb items={[{ label: 'Bookmarks', href: '/bookmarks' }]} />
 
   <PageHeading>
     Bookmarks
@@ -31,7 +31,7 @@ import ViewToggle from '../components/ui/ViewToggle.astro';
 
 <script>
   import { getBookmarks, removeBookmark, type BookmarkItem } from '../lib/bookmarks-client';
-  import { categoryLabel, categoryPillClass } from '../consts';
+  import { categoryLabel, categoryPillClass, categoryUrlSlug } from '../consts';
   import { relativeTime, formatDate } from '../utils/formatDate';
 
   function sourceInitials(source: string): string {
@@ -116,7 +116,7 @@ import ViewToggle from '../components/ui/ViewToggle.astro';
     footer.className = 'flex flex-wrap items-center gap-2 mt-auto pt-3';
 
     const categoryPill = document.createElement('a');
-    categoryPill.href = `/category/${item.category}/`;
+    categoryPill.href = `/category/${categoryUrlSlug(item.category)}/`;
     categoryPill.className = `${categoryPillClass(item.category)} text-on-secondary font-label-md text-label-md px-2 py-1 rounded uppercase tracking-wider text-[10px] font-bold hover:opacity-90 transition-opacity`;
     categoryPill.textContent = categoryLabel(item.category);
 

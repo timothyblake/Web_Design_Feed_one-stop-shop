@@ -15,6 +15,12 @@ export const CATEGORIES = [
   { slug: 'career', label: 'Career', icon: 'work', pill: 'secondary' },
 ] as const;
 
+// Longer-form title for the /category/ page itself (<h1>, <title>, breadcrumb).
+// Falls back to the short `label` used everywhere else (sidenav, story pills).
+const CATEGORY_PAGE_TITLES: Partial<Record<(typeof CATEGORIES)[number]['slug'], string>> = {
+  'front-end': 'Front-end Development',
+};
+
 export type CategorySlug = (typeof CATEGORIES)[number]['slug'];
 
 export const CATEGORY_DESCRIPTIONS: Record<CategorySlug, string> = {
@@ -62,6 +68,20 @@ export const CATEGORY_BLURBS: Record<CategorySlug, string[]> = {
 
 export function categoryLabel(slug: string): string {
   return CATEGORIES.find((c) => c.slug === slug)?.label ?? slug;
+}
+
+export function categoryPageTitle(slug: string): string {
+  return CATEGORY_PAGE_TITLES[slug as (typeof CATEGORIES)[number]['slug']] ?? categoryLabel(slug);
+}
+
+// The /category/ URL segment, slugified from categoryPageTitle — matches the
+// existing short slug for every category except front-end, which now has a
+// longer page title and therefore a longer URL.
+export function categoryUrlSlug(slug: string): string {
+  return categoryPageTitle(slug)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 export function categoryPillClass(slug: string): string {

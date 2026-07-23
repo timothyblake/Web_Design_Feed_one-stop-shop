@@ -1,6 +1,6 @@
 User-agent: *
 Allow: /
-Disallow: /search/
+Disallow: /search
 Disallow: /studio
 Disallow: /*?q=
 Disallow: /*?*

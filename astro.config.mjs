@@ -15,7 +15,7 @@ const env = loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), '');
 // https://astro.build/config
 export default defineConfig({
   site: 'https://webdesignfeed.com',
-  trailingSlash: 'always',
+  trailingSlash: 'never',
   prefetch: {
     prefetchAll: true,
     defaultStrategy: 'viewport',
@@ -26,6 +26,11 @@ export default defineConfig({
   },
   build: {
     inlineStylesheets: 'auto',
+  },
+  redirects: {
+    // The front-end category page moved from /category/front-end to
+    // /category/front-end-development when its page title changed.
+    '/category/front-end': '/category/front-end-development',
   },
   integrations: [
     mdx(),

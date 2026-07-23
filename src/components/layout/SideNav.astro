@@ -1,5 +1,5 @@
 ---
-import { CATEGORIES } from "../../consts";
+import { CATEGORIES, categoryUrlSlug } from "../../consts";
 
 interface Props {
   activeCategory?: string;
@@ -40,7 +40,7 @@ const { activeCategory } = Astro.props;
     {
       CATEGORIES.map((category) => (
         <a
-          href={`/category/${category.slug}/`}
+          href={`/category/${categoryUrlSlug(category.slug)}`}
           aria-current={activeCategory === category.slug ? "page" : undefined}
           class={`rounded-xl p-3 font-label-md text-label-md flex items-center gap-3 transition-colors ${
             activeCategory === category.slug
@@ -78,13 +78,13 @@ const { activeCategory } = Astro.props;
         Get the best of the web design feed delivered weekly.
       </p>
       <a
-        href="/newsletter/"
+        href="/newsletter"
         class="block text-center w-full bg-secondary text-on-secondary font-label-md text-sm py-2 rounded-lg hover:opacity-90 active:scale-95 transition-all font-semibold"
       >
         Join newsletter
       </a>
       <a
-        href="/feeds/"
+        href="/feeds"
         data-astro-reload
         class="block text-center w-full border border-outline text-primary dark:text-inverse-on-surface font-label-md text-sm py-2 rounded-lg hover:bg-surface-variant transition-all font-semibold mt-2"
       >

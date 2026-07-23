@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { categoryLabel, categoryPillClass } from '../../consts';
+import { categoryLabel, categoryPillClass, categoryUrlSlug } from '../../consts';
 import { relativeTime, formatDate } from '../../utils/formatDate';
 
 interface Props {
@@ -117,14 +117,14 @@ const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSe
 
   <div class="flex flex-wrap items-center gap-2 mt-auto pt-3">
     <a
-      href={`/category/${category}/`}
+      href={`/category/${categoryUrlSlug(category)}`}
       class={`${categoryPillClass(category)} text-on-secondary font-label-md text-label-md px-2 py-1 rounded uppercase tracking-wider text-[10px] font-bold hover:opacity-90 transition-opacity`}
     >
       {categoryLabel(category)}
     </a>
     {tags.map((tag) => (
       <a
-        href={`/tag/${tag}/`}
+        href={`/tag/${tag}`}
         class="text-on-surface-variant font-label-md text-label-md text-xs hover:text-primary dark:hover:text-inverse-on-surface transition-colors"
       >
         #{tag}

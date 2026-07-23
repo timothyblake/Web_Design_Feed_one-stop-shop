@@ -1,5 +1,5 @@
 ---
-import { CATEGORIES, SITE_TITLE, SITE_LOGO } from '../../consts';
+import { CATEGORIES, SITE_TITLE, SITE_LOGO, categoryUrlSlug } from '../../consts';
 
 interface Props {
   currentPath: string;
@@ -8,9 +8,9 @@ interface Props {
 const { currentPath } = Astro.props;
 
 const navLinks = [
-  { href: '/featured/', label: 'Featured' },
-  { href: '/newsletter/', label: 'Newsletter' },
-  { href: '/about/', label: 'About' },
+  { href: '/featured', label: 'Featured' },
+  { href: '/newsletter', label: 'Newsletter' },
+  { href: '/about', label: 'About' },
 ];
 
 function isActive(href: string): boolean {
@@ -58,7 +58,7 @@ function isActive(href: string): boolean {
       <div id="desktop-search" class="hidden lg:flex items-center">
         <form
           id="desktop-search-form"
-          action="/search/"
+          action="/search"
           method="get"
           class="flex items-center overflow-hidden w-0 opacity-0 pointer-events-none mr-0 transition-[width,opacity,margin] duration-300 ease-out"
           role="search"
@@ -88,7 +88,7 @@ function isActive(href: string): boolean {
 
       <a
         id="bookmarks-link"
-        href="/bookmarks/"
+        href="/bookmarks"
         aria-current={isActive('/bookmarks/') ? 'page' : undefined}
         class="relative -mr-2 md:mr-0 text-primary dark:text-inverse-on-surface p-2 rounded-full hover:bg-surface-variant transition-colors"
         aria-label="View bookmarks"
@@ -109,7 +109,7 @@ function isActive(href: string): boolean {
     class="hidden md:hidden absolute top-full left-0 w-full max-h-[calc(100vh-4rem)] overflow-y-auto bg-surface dark:bg-inverse-surface border-b border-[#dee2e6] dark:border-outline-variant shadow-lg transition-all duration-300 origin-top"
   >
     <nav aria-label="Mobile" class="flex flex-col p-4 gap-2">
-      <form action="/search/" method="get" class="relative w-full mb-4" role="search">
+      <form action="/search" method="get" class="relative w-full mb-4" role="search">
         <label for="mobile-search" class="sr-only">Search stories</label>
         <input
           id="mobile-search"
@@ -126,7 +126,7 @@ function isActive(href: string): boolean {
         </h2>
         <div class="flex flex-col gap-1">
           {CATEGORIES.map((category) => {
-            const href = `/category/${category.slug}/`;
+            const href = `/category/${categoryUrlSlug(category.slug)}`;
 
             return (
               <a
@@ -162,7 +162,7 @@ function isActive(href: string): boolean {
         </a>
       ))}
       <a
-        href="/bookmarks/"
+        href="/bookmarks"
         aria-current={isActive('/bookmarks/') ? 'page' : undefined}
         class={`p-3 rounded-lg transition-colors ${
           isActive('/bookmarks/')

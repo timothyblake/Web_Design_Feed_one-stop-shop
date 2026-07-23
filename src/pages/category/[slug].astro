@@ -1,5 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import StoryCard from '../../components/ui/StoryCard.astro';
 import Breadcrumb from '../../components/ui/Breadcrumb.astro';
@@ -8,7 +8,8 @@ import PageHeading from '../../components/ui/PageHeading.astro';
 import ViewToggle from '../../components/ui/ViewToggle.astro';
 import {
   CATEGORIES,
-  categoryLabel,
+  categoryPageTitle,
+  categoryUrlSlug,
   CATEGORY_BLURBS,
   CATEGORY_DESCRIPTIONS,
   type CategorySlug,
@@ -18,8 +19,13 @@ import {
 export async function getStaticPaths() {
   const stories = await getCollection('stories');
   return CATEGORIES.map((category) => ({
-    params: { slug: category.slug },
+    // The URL segment is slugified from the page title, so it only diverges
+    // from `category.slug` for categories with a longer page title (e.g.
+    // front-end → front-end-development) — story filtering below still keys
+    // off the original `category.slug`, which is what's stored in Sanity.
+    params: { slug: categoryUrlSlug(category.slug) },
     props: {
+      categorySlug: category.slug,
       stories: stories
         .filter((s) => s.data.category === category.slug)
         .sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf()),
@@ -27,18 +33,23 @@ export async function getStaticPaths() {
   }));
 }
 
-const { slug } = Astro.params as { slug: CategorySlug };
-const { stories } = Astro.props;
-const label = categoryLabel(slug);
-const blurb = CATEGORY_BLURBS[slug];
-const shortDescription = CATEGORY_DESCRIPTIONS[slug];
+interface Props {
+  categorySlug: CategorySlug;
+  stories: CollectionEntry<'stories'>[];
+}
+
+const { categorySlug, stories } = Astro.props;
+const urlSlug = categoryUrlSlug(categorySlug);
+const label = categoryPageTitle(categorySlug);
+const blurb = CATEGORY_BLURBS[categorySlug];
+const shortDescription = CATEGORY_DESCRIPTIONS[categorySlug];
 const description = `The latest ${label} stories — curated links to the best articles across the web.`;
 
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'ItemList',
   name: `${label} stories`,
-  url: `${SITE_URL}/category/${slug}/`,
+  url: `${SITE_URL}/category/${urlSlug}`,
   itemListElement: stories.map((story, i) => ({
     '@type': 'ListItem',
     position: i + 1,
@@ -48,8 +59,8 @@ const jsonLd = {
 };
 ---
 
-<BaseLayout title={label} description={description} activeCategory={slug} structuredData={jsonLd}>
-  <Breadcrumb items={[{ label, href: `/category/${slug}/` }]} />
+<BaseLayout title={label} description={description} activeCategory={categorySlug} structuredData={jsonLd}>
+  <Breadcrumb items={[{ label, href: `/category/${urlSlug}` }]} />
 
   <PageHeading>
     {label}
