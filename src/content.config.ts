@@ -1,4 +1,5 @@
-import { defineCollection, z } from 'astro:content';
+import { defineCollection } from 'astro:content';
+import { z } from 'astro/zod';
 import { sanityStoriesLoader } from './loaders/sanityStories';
 import { CATEGORIES } from './consts';
 
@@ -12,7 +13,7 @@ const stories = defineCollection({
   loader: sanityStoriesLoader(),
   schema: z.object({
     title: z.string(),
-    url: z.string().url(),
+    url: z.url(),
     description: z.string().min(1).max(280),
     source: z.string(),
     category: z.enum(categorySlugs),
@@ -21,7 +22,7 @@ const stories = defineCollection({
     publishedAt: z.coerce.date(),
     // GROQ returns `null` (not absent) for stories without an image, and
     // zod's `.optional()` only accepts `undefined` — `.nullish()` covers both.
-    image: z.string().url().nullish(),
+    image: z.url().nullish(),
     imageAlt: z.string().nullish(),
   }),
 });

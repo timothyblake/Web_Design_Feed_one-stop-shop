@@ -1,5 +1,6 @@
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
+import { visionTool } from '@sanity/vision';
 import { schemaTypes } from './sanity/schemaTypes';
 
 // Embedded Studio config, auto-detected by the `@sanity/astro` integration
@@ -17,7 +18,7 @@ export default defineConfig({
   // Without it, login redirects to bare `<origin>/callback`, which Astro
   // has no route for and the sign-in flow just hangs there.
   basePath: '/studio',
-  plugins: [structureTool()],
+  plugins: [structureTool(), visionTool()],
   schema: {
     types: schemaTypes,
   },
