@@ -57,7 +57,10 @@ export default defineConfig({
     }),
     react(),
     // Keep compress last so it optimizes the final output of every other integration.
-    compress(),
+    // CSS compression is disabled: its minifier (csso) doesn't understand
+    // Tailwind v4's modern range media-query syntax (`@media (width >= 64rem)`)
+    // and silently drops those blocks, breaking every responsive layout.
+    compress({ CSS: false }),
   ],
   vite: {
     plugins: [tailwindcss()],
