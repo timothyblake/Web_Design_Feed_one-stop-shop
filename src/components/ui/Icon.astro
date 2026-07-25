@@ -1,0 +1,30 @@
+---
+import { ICONS, type IconDef, type IconName } from '../../lib/icons';
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'svg'> {
+  name: IconName;
+  /** Use the filled path variant (icons without one fall back to the outline path). */
+  filled?: boolean;
+  size?: number;
+}
+
+const { name, filled = false, size = 24, class: className, ...rest } = Astro.props;
+const icon: IconDef = ICONS[name];
+const d = filled ? (icon.fillPath ?? icon.path) : icon.path;
+---
+
+<svg
+  class:list={['icon', className]}
+  width={size}
+  height={size}
+  viewBox="0 -960 960 960"
+  fill="currentColor"
+  aria-hidden="true"
+  data-icon={name}
+  data-path-outline={icon.path}
+  data-path-fill={icon.fillPath ?? icon.path}
+  {...rest}
+>
+  <path d={d} />
+</svg>

@@ -1,4 +1,6 @@
 ---
+import Icon from './Icon.astro';
+
 interface Props {
   title: string;
   /** Collapsed height before the gradient fade kicks in. */
@@ -39,13 +41,12 @@ const { title, collapsedHeight = '4.5rem' } = Astro.props;
     class="mt-2 inline-flex items-center gap-1 font-label-md text-label-md font-bold text-primary hover:text-secondary transition-colors"
   >
     <span data-seo-toggle-label>Read More</span>
-    <span
+    <Icon
+      name="expand_more"
+      size={20}
       data-seo-toggle-icon
-      class="material-symbols-outlined text-[20px] transition-transform duration-300"
-      aria-hidden="true"
-    >
-      expand_more
-    </span>
+      class="transition-transform duration-300"
+    />
   </button>
 </section>
 

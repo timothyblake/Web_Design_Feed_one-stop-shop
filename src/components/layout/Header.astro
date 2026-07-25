@@ -1,5 +1,7 @@
 ---
 import { CATEGORIES, SITE_TITLE, SITE_LOGO, categoryUrlSlug } from '../../consts';
+import Icon from '../ui/Icon.astro';
+import type { IconName } from '../../lib/icons';
 
 interface Props {
   currentPath: string;
@@ -30,7 +32,7 @@ function isActive(href: string): boolean {
         aria-expanded="false"
         aria-controls="mobile-menu"
       >
-        <span class="material-symbols-outlined" aria-hidden="true">menu</span>
+        <Icon name="menu" />
       </button>
 
       <a href="/" class="flex items-center justify-self-center md:justify-self-auto gap-2" aria-label={SITE_TITLE}>
@@ -82,7 +84,7 @@ function isActive(href: string): boolean {
           aria-expanded="false"
           aria-controls="desktop-search-form"
         >
-          <span id="search-toggle-icon" class="material-symbols-outlined block" aria-hidden="true">search</span>
+          <Icon name="search" id="search-toggle-icon" class="block" />
         </button>
       </div>
 
@@ -93,7 +95,7 @@ function isActive(href: string): boolean {
         class="relative -mr-2 md:mr-0 text-primary p-2 rounded-full hover:bg-surface-variant transition-colors"
         aria-label="View bookmarks"
       >
-        <span class="material-symbols-outlined block" aria-hidden="true">bookmark</span>
+        <Icon name="bookmark" class="block" />
         <span
           id="bookmark-count"
           class="absolute -right-0.5 -top-0.5 hidden min-w-4 h-4 px-1 items-center justify-center rounded-full bg-secondary text-on-secondary text-[10px] leading-none font-bold tabular-nums"
@@ -139,9 +141,7 @@ function isActive(href: string): boolean {
                     : 'text-on-surface-variant hover:bg-surface-variant'
                 }`}
               >
-                <span class="material-symbols-outlined text-[20px]" aria-hidden="true">
-                  {category.icon}
-                </span>
+                <Icon name={category.icon as IconName} size={20} />
                 {category.label}
               </a>
             );
@@ -179,6 +179,11 @@ function isActive(href: string): boolean {
 
 <script>
   import { BOOKMARKS_CHANGED_EVENT, getBookmarks } from '../../lib/bookmarks-client';
+  import { ICONS, type IconName } from '../../lib/icons';
+
+  function iconSvg(name: IconName, className = 'icon'): string {
+    return `<svg class="${className}" width="24" height="24" viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true" data-icon="${name}"><path d="${ICONS[name].path}"/></svg>`;
+  }
 
   // The whole <header> is swapped in fresh on every ClientRouter navigation
   // (it re-renders per page so `aria-current` tracks the new URL), so its
@@ -204,7 +209,9 @@ function isActive(href: string): boolean {
     desktopSearchForm.toggleAttribute('inert', !open);
     searchToggle.setAttribute('aria-expanded', String(open));
     searchToggle.setAttribute('aria-label', open ? 'Close search' : 'Open search');
-    if (searchToggleIcon) searchToggleIcon.textContent = open ? 'close' : 'search';
+    searchToggleIcon
+      ?.querySelector('path')
+      ?.setAttribute('d', ICONS[open ? 'close' : 'search'].path);
 
     if (open) {
       requestAnimationFrame(() => siteSearchInput?.focus());
@@ -223,9 +230,7 @@ function isActive(href: string): boolean {
     mobileMenu.toggleAttribute('inert', !open);
     mobileBtn.setAttribute('aria-expanded', String(open));
     mobileBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-    mobileBtn.innerHTML = open
-      ? '<span class="material-symbols-outlined" aria-hidden="true">close</span>'
-      : '<span class="material-symbols-outlined" aria-hidden="true">menu</span>';
+    mobileBtn.innerHTML = iconSvg(open ? 'close' : 'menu');
 
     if (open) {
       requestAnimationFrame(() => mobileSearch?.focus());

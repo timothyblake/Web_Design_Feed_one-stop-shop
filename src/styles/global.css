@@ -88,6 +88,13 @@
     height: auto;
   }
 
+  /* Icon.astro's inline SVGs default to the reset above (display: block),
+     matching the old icon font's standalone-glyph behavior. Icons rendered
+     inline with surrounding text opt into it via the `inline` class. */
+  .icon.inline {
+    display: inline;
+  }
+
   /* WCAG 1.4.4: rem-based type respects the user's browser font-size
      preference, so we never hard-set px font sizes globally. */
   html {

@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import { categoryLabel, categoryPillClass, categoryUrlSlug } from '../../consts';
 import { relativeTime, formatDate } from '../../utils/formatDate';
+import Icon from './Icon.astro';
 
 interface Props {
   story: CollectionEntry<'stories'>;
@@ -49,13 +50,7 @@ const shareMenuId = `share-menu-${story.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
 >
   {featured && (
     <>
-      <span
-        class="material-symbols-outlined absolute top-3 right-3 z-10 text-[20px] text-secondary"
-        style="font-variation-settings: 'FILL' 1"
-        aria-hidden="true"
-      >
-        star
-      </span>
+      <Icon name="star" filled size={20} class="absolute top-3 right-3 z-10 text-secondary" />
       <span class="sr-only">Featured</span>
     </>
   )}
@@ -114,7 +109,7 @@ const shareMenuId = `share-menu-${story.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
       class="hover:text-secondary transition-colors focus-visible:outline-none focus-visible:underline"
     >
       {title}
-      <span class="material-symbols-outlined !text-[15px] ml-[5px] align-middle opacity-60" aria-hidden="true">open_in_new</span>
+      <Icon name="open_in_new" size={15} class="ml-[5px] align-middle opacity-60 inline" />
       <span class="sr-only">(opens {hostname} in a new tab)</span>
     </a>
   </h2>
@@ -150,7 +145,7 @@ const shareMenuId = `share-menu-${story.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
         data-bookmark-category={category}
         data-bookmark-published={publishedAt.toISOString()}
       >
-        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">bookmark_add</span>
+        <Icon name="bookmark_add" size={20} />
       </button>
       <div class="share-wrapper relative">
         <button
@@ -163,7 +158,7 @@ const shareMenuId = `share-menu-${story.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
           data-share-title={title}
           data-share-text={description}
         >
-          <span class="material-symbols-outlined text-[20px]" aria-hidden="true">share</span>
+          <Icon name="share" size={20} />
         </button>
 
         <div
@@ -204,7 +199,7 @@ const shareMenuId = `share-menu-${story.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
             data-share-title={title}
             data-share-text={description}
           >
-            <span class="material-symbols-outlined text-[16px] shrink-0" aria-hidden="true">ios_share</span>
+            <Icon name="ios_share" size={16} class="shrink-0" />
             More options…
           </button>
           <hr class="border-outline/40 my-1" />
@@ -213,7 +208,7 @@ const shareMenuId = `share-menu-${story.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
             class="copy-link-btn flex items-center gap-2 px-3 py-2 text-sm w-full text-left text-primary hover:bg-surface-variant transition-colors"
             data-copy-url={url}
           >
-            <span class="material-symbols-outlined text-[16px] shrink-0" aria-hidden="true">link</span>
+            <Icon name="link" size={16} class="shrink-0" />
             <span class="copy-label">Copy link</span>
           </button>
         </div>
@@ -228,12 +223,14 @@ const shareMenuId = `share-menu-${story.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
   function renderBookmarkButton(btn: HTMLButtonElement) {
     const url = btn.dataset.bookmarkUrl ?? '';
     const title = btn.dataset.bookmarkTitle ?? '';
-    const icon = btn.querySelector<HTMLElement>('.material-symbols-outlined');
+    const icon = btn.querySelector<SVGElement>('.icon');
     const saved = isBookmarked(url);
 
     btn.setAttribute('aria-pressed', String(saved));
     btn.setAttribute('aria-label', `${saved ? 'Remove' : 'Save'} "${title}" ${saved ? 'from' : 'to'} bookmarks`);
-    if (icon) icon.style.fontVariationSettings = `'FILL' ${saved ? 1 : 0}`;
+    const path = icon?.querySelector('path');
+    const nextD = saved ? icon?.dataset.pathFill : icon?.dataset.pathOutline;
+    if (path && nextD) path.setAttribute('d', nextD);
   }
 
   // Share is a popover of explicit social destinations (X, LinkedIn, Facebook,

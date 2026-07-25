@@ -1,5 +1,7 @@
 ---
 import { CATEGORIES, categoryUrlSlug } from "../../consts";
+import Icon from "../ui/Icon.astro";
+import type { IconName } from "../../lib/icons";
 
 interface Props {
   activeCategory?: string;
@@ -32,9 +34,7 @@ const { activeCategory } = Astro.props;
           : "text-primary hover:bg-surface-variant font-semibold"
       }`}
     >
-      <span class="material-symbols-outlined text-[20px]" aria-hidden="true"
-        >apps</span
-      >
+      <Icon name="apps" size={20} />
       All Stories
     </a>
     {
@@ -48,13 +48,11 @@ const { activeCategory } = Astro.props;
               : "text-primary hover:bg-surface-variant font-semibold"
           }`}
         >
-          <span
-            class="material-symbols-outlined text-[20px]"
-            style={`font-variation-settings: 'FILL' ${activeCategory === category.slug ? 1 : 0}`}
-            aria-hidden="true"
-          >
-            {category.icon}
-          </span>
+          <Icon
+            name={category.icon as IconName}
+            size={20}
+            filled={activeCategory === category.slug}
+          />
           {category.label}
         </a>
       ))

@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumb from '../components/ui/Breadcrumb.astro';
 import PageHeading from '../components/ui/PageHeading.astro';
 import ViewToggle from '../components/ui/ViewToggle.astro';
+import Icon from '../components/ui/Icon.astro';
 ---
 
 <BaseLayout
@@ -22,7 +23,7 @@ import ViewToggle from '../components/ui/ViewToggle.astro';
   </p>
 
   <p id="bookmarks-empty" class="text-on-surface-variant py-stack-lg text-center hidden">
-    No bookmarks yet. Tap the <span class="material-symbols-outlined text-[16px] align-middle" aria-hidden="true">bookmark_add</span>
+    No bookmarks yet. Tap the <Icon name="bookmark_add" size={16} class="inline align-middle" />
     icon on any story to save it here — saved locally in this browser.
   </p>
 
@@ -35,6 +36,7 @@ import ViewToggle from '../components/ui/ViewToggle.astro';
   import { getBookmarks, removeBookmark, type BookmarkItem } from '../lib/bookmarks-client';
   import { categoryLabel, categoryPillClass, categoryUrlSlug } from '../consts';
   import { relativeTime, formatDate } from '../utils/formatDate';
+  import { ICONS } from '../lib/icons';
 
   function sourceInitials(source: string): string {
     return source
@@ -126,7 +128,7 @@ import ViewToggle from '../components/ui/ViewToggle.astro';
     removeBtn.type = 'button';
     removeBtn.className = 'ml-auto text-primary hover:text-secondary transition-all';
     removeBtn.setAttribute('aria-label', `Remove "${item.title}" from bookmarks`);
-    removeBtn.innerHTML = '<span class="material-symbols-outlined text-[20px]" aria-hidden="true">delete</span>';
+    removeBtn.innerHTML = `<svg class="icon" width="20" height="20" viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true" data-icon="delete"><path d="${ICONS.delete.path}"/></svg>`;
     removeBtn.addEventListener('click', () => {
       removeBookmark(item.url);
       li.remove();

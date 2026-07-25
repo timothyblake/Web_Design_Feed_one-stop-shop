@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumb from '../components/ui/Breadcrumb.astro';
 import NewsletterCTA from '../components/ui/NewsletterCTA.astro';
 import PageHeading from '../components/ui/PageHeading.astro';
+import Icon from '../components/ui/Icon.astro';
 ---
 
 <BaseLayout
@@ -27,7 +28,7 @@ import PageHeading from '../components/ui/PageHeading.astro';
       The archive lives on Buttondown —
       <a href="https://buttondown.email/webdesignfeed/archive" class="underline hover:text-primary" target="_blank" rel="noopener noreferrer">
         browse past issues
-        <span class="material-symbols-outlined !text-[15px] ml-[5px] align-middle" aria-hidden="true">open_in_new</span>
+        <Icon name="open_in_new" size={15} class="ml-[5px] align-middle inline" />
       </a>.
     </p>
   </section>

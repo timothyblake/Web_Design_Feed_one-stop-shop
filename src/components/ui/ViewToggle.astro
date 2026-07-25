@@ -6,6 +6,7 @@
 // applied at runtime via classList.toggle — Tailwind's build-time scanner
 // only sees literal classes in markup, so responsive utility strings
 // assembled in JS get purged from the production build.
+import Icon from './Icon.astro';
 ---
 
 <div class="view-toggle hidden sm:flex items-center gap-1 shrink-0" role="group" aria-label="Story layout">
@@ -16,7 +17,7 @@
     aria-pressed="true"
     aria-label="List view"
   >
-    <span class="material-symbols-outlined text-[20px]" aria-hidden="true">view_list</span>
+    <Icon name="view_list" size={20} />
   </button>
   <button
     type="button"
@@ -25,7 +26,7 @@
     aria-pressed="false"
     aria-label="Grid view"
   >
-    <span class="material-symbols-outlined text-[20px]" aria-hidden="true">grid_view</span>
+    <Icon name="grid_view" size={20} />
   </button>
 </div>
 
