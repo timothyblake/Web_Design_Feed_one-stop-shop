@@ -168,10 +168,4 @@
       scroll-behavior: auto !important;
     }
   }
-
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --color-on-surface-variant: oklch(80% 0.006 75);
-    }
-  }
 }
