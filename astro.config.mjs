@@ -17,8 +17,8 @@ export default defineConfig({
   site: 'https://webdesignfeed.com',
   trailingSlash: 'never',
   prefetch: {
-    prefetchAll: true,
-    defaultStrategy: 'viewport',
+    prefetchAll: false,
+    defaultStrategy: 'hover',
   },
   image: {
     layout: 'constrained',
@@ -45,7 +45,7 @@ export default defineConfig({
       projectId: env.PUBLIC_SANITY_PROJECT_ID || 'your-project-id',
       dataset: env.PUBLIC_SANITY_DATASET || 'production',
       apiVersion: env.PUBLIC_SANITY_API_VERSION || '2024-01-01',
-      useCdn: false,
+      useCdn: true,
       studioBasePath: '/studio',
     }),
     react(),

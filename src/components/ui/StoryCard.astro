@@ -35,6 +35,7 @@ const shareText = `${title} — via ${source}`;
 const twitterShareUrl = `https://twitter.com/intent/tweet?${new URLSearchParams({ url, text: shareText }).toString()}`;
 const linkedInShareUrl = `https://www.linkedin.com/sharing/share-offsite/?${new URLSearchParams({ url }).toString()}`;
 const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSearchParams({ u: url }).toString()}`;
+const shareMenuId = `share-menu-${story.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
 ---
 
 <article
@@ -47,19 +48,24 @@ const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSe
   ]}
 >
   {featured && (
-    <span
-      class="material-symbols-outlined absolute top-3 right-3 z-10 text-[20px] text-secondary"
-      style="font-variation-settings: 'FILL' 1"
-      aria-hidden="true"
-    >
-      star
-    </span>
+    <>
+      <span
+        class="material-symbols-outlined absolute top-3 right-3 z-10 text-[20px] text-secondary"
+        style="font-variation-settings: 'FILL' 1"
+        aria-hidden="true"
+      >
+        star
+      </span>
+      <span class="sr-only">Featured</span>
+    </>
   )}
 
   {image && (
     <a href={url} target="_blank" rel="noopener noreferrer" class="block -mx-stack-md -mt-stack-md mb-2 overflow-hidden rounded-t-xl">
       <img
         src={`${image}?w=800&h=420&fit=crop&auto=format`}
+        srcset={`${image}?w=400&h=210&fit=crop&auto=format 400w, ${image}?w=800&h=420&fit=crop&auto=format 800w, ${image}?w=1200&h=630&fit=crop&auto=format 1200w`}
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 800px"
         alt={imageAlt ?? ''}
         width="800"
         height="420"
@@ -151,8 +157,8 @@ const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSe
           type="button"
           class="share-btn text-primary hover:text-secondary transition-all"
           aria-label={`Share "${title}"`}
-          aria-haspopup="menu"
           aria-expanded="false"
+          aria-controls={shareMenuId}
           data-share-url={url}
           data-share-title={title}
           data-share-text={description}
@@ -161,11 +167,10 @@ const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSe
         </button>
 
         <div
+          id={shareMenuId}
           class="share-menu hidden absolute right-0 bottom-full mb-2 z-20 w-52 rounded-xl border border-outline bg-background shadow-lg py-1 text-left"
-          role="menu"
         >
           <a
-            role="menuitem"
             href={twitterShareUrl}
             target="_blank"
             rel="noopener noreferrer"
@@ -175,7 +180,6 @@ const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSe
             Share on X
           </a>
           <a
-            role="menuitem"
             href={linkedInShareUrl}
             target="_blank"
             rel="noopener noreferrer"
@@ -185,7 +189,6 @@ const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSe
             Share on LinkedIn
           </a>
           <a
-            role="menuitem"
             href={facebookShareUrl}
             target="_blank"
             rel="noopener noreferrer"
@@ -196,7 +199,6 @@ const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSe
           </a>
           <button
             type="button"
-            role="menuitem"
             class="share-native-item hidden items-center gap-2 px-3 py-2 text-sm w-full text-left text-primary hover:bg-surface-variant transition-colors"
             data-share-url={url}
             data-share-title={title}
@@ -208,7 +210,6 @@ const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSe
           <hr class="border-outline/40 my-1" />
           <button
             type="button"
-            role="menuitem"
             class="copy-link-btn flex items-center gap-2 px-3 py-2 text-sm w-full text-left text-primary hover:bg-surface-variant transition-colors"
             data-copy-url={url}
           >
@@ -238,11 +239,16 @@ const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSe
   // Share is a popover of explicit social destinations (X, LinkedIn, Facebook,
   // copy link) rather than a bare Web Share API call, so desktop users — who
   // have no native share sheet — still get one-click posting to social sites.
-  function closeAllShareMenus(except?: HTMLElement) {
+  function closeAllShareMenus(except?: HTMLElement, returnFocus = false) {
     document.querySelectorAll<HTMLElement>('.share-menu').forEach((menu) => {
       if (menu === except) return;
+      const wasOpen = !menu.classList.contains('hidden');
       menu.classList.add('hidden');
-      menu.closest('.share-wrapper')?.querySelector('.share-btn')?.setAttribute('aria-expanded', 'false');
+      const shareBtn = menu.closest('.share-wrapper')?.querySelector<HTMLButtonElement>('.share-btn');
+      shareBtn?.setAttribute('aria-expanded', 'false');
+      if (wasOpen && returnFocus && shareBtn) {
+        shareBtn.focus();
+      }
     });
   }
 
@@ -341,6 +347,6 @@ const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSe
   // ClientRouter, so these are safe to register exactly once.
   document.addEventListener('click', () => closeAllShareMenus());
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeAllShareMenus();
+    if (e.key === 'Escape') closeAllShareMenus(undefined, true);
   });
 </script>

@@ -1,0 +1,97 @@
+---
+import type { GetStaticPaths, Page } from 'astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StoryCard from '../../components/ui/StoryCard.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
+import SeoBlurb from '../../components/ui/SeoBlurb.astro';
+import PageHeading from '../../components/ui/PageHeading.astro';
+import ViewToggle from '../../components/ui/ViewToggle.astro';
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const stories = (await getCollection('stories', ({ data }) => data.featured)).sort(
+    (a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf()
+  );
+  return paginate(stories, { pageSize: 10 });
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props as { page: Page<CollectionEntry<'stories'>> };
+
+const title = page.currentPage === 1
+  ? 'Featured'
+  : `Featured Stories — Page ${page.currentPage}`;
+---
+
+<BaseLayout
+  title={title}
+  description="Editor's picks — the stories that make it into the weekly newsletter digest."
+>
+  <Breadcrumb items={[{ label: 'Featured', href: '/featured' }]} />
+
+  <PageHeading>
+    {page.currentPage === 1 ? "Editor's Picks" : `Editor's Picks — Page ${page.currentPage}`}
+    <ViewToggle slot="actions" />
+  </PageHeading>
+  <p class="text-on-surface-variant mb-stack-md text-sm">
+    The best stories of the week, hand-picked. Powers the <a href="/newsletter" class="underline hover:text-primary">weekly digest</a>.
+  </p>
+
+  <ol data-story-list class="flex flex-col gap-stack-md list-none p-0 m-0">
+    {page.data.map((story, i) => (
+      <li>
+        <StoryCard story={story} priority={page.currentPage === 1 && i < 3} />
+      </li>
+    ))}
+  </ol>
+
+  {page.data.length === 0 && (
+    <p class="text-on-surface-variant py-stack-lg text-center">No featured stories yet this week.</p>
+  )}
+
+  {page.lastPage > 1 && (
+    <nav aria-label="Pagination" class="mt-8 flex items-center justify-center gap-3 border-t border-outline pt-8 pb-4">
+      {page.url.prev ? (
+        <a
+          href={page.url.prev}
+          class="border border-outline text-primary font-label-md text-label-md px-5 py-2.5 rounded-lg hover:bg-surface-variant transition-all font-semibold"
+        >
+          Previous
+        </a>
+      ) : (
+        <span aria-hidden="true" class="px-5 py-2.5 opacity-0">Previous</span>
+      )}
+
+      <span class="text-on-surface-variant text-sm">
+        Page {page.currentPage} of {page.lastPage}
+      </span>
+
+      {page.url.next ? (
+        <a
+          href={page.url.next}
+          class="bg-secondary text-on-secondary font-label-md text-label-md px-6 py-2.5 rounded-lg hover:opacity-90 transition-all shadow-sm font-semibold"
+        >
+          Next
+        </a>
+      ) : (
+        <span aria-hidden="true" class="px-6 py-2.5 opacity-0">Next</span>
+      )}
+    </nav>
+  )}
+
+  {page.currentPage === 1 && (
+    <SeoBlurb title="About Featured Stories on Web Design Feed">
+      <p>
+        Featured stories are the editor's picks from across UI and UX design, front-end and back-end
+        development, resources, and business.
+      </p>
+      <p>
+        Each selection is chosen for its practical insight, original thinking, or usefulness to people who
+        design and build for the web.
+      </p>
+      <p>
+        Browse the latest picks here or get the highlights delivered in the weekly newsletter digest. Every
+        story links directly to the original author and source.
+      </p>
+    </SeoBlurb>
+  )}
+</BaseLayout>

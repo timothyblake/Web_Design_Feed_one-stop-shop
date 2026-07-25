@@ -89,7 +89,7 @@ function isActive(href: string): boolean {
       <a
         id="bookmarks-link"
         href="/bookmarks"
-        aria-current={isActive('/bookmarks/') ? 'page' : undefined}
+        aria-current={isActive('/bookmarks') ? 'page' : undefined}
         class="relative -mr-2 md:mr-0 text-primary p-2 rounded-full hover:bg-surface-variant transition-colors"
         aria-label="View bookmarks"
       >
@@ -163,9 +163,9 @@ function isActive(href: string): boolean {
       ))}
       <a
         href="/bookmarks"
-        aria-current={isActive('/bookmarks/') ? 'page' : undefined}
+        aria-current={isActive('/bookmarks') ? 'page' : undefined}
         class={`p-3 rounded-lg transition-colors ${
-          isActive('/bookmarks/')
+          isActive('/bookmarks')
             ? 'font-bold text-primary bg-surface-variant'
             : 'text-on-surface-variant hover:bg-surface-variant'
         }`}
@@ -212,6 +212,26 @@ function isActive(href: string): boolean {
     }
   }
 
+  function setMobileOpen(open: boolean, returnFocus = false) {
+    const mobileBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileSearch = document.getElementById('mobile-search') as HTMLInputElement | null;
+    if (!mobileBtn || !mobileMenu) return;
+
+    mobileMenu.classList.toggle('hidden', !open);
+    mobileBtn.setAttribute('aria-expanded', String(open));
+    mobileBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    mobileBtn.innerHTML = open
+      ? '<span class="material-symbols-outlined" aria-hidden="true">close</span>'
+      : '<span class="material-symbols-outlined" aria-hidden="true">menu</span>';
+
+    if (open) {
+      requestAnimationFrame(() => mobileSearch?.focus());
+    } else if (returnFocus) {
+      mobileBtn.focus();
+    }
+  }
+
   function syncBookmarkCount() {
     const bookmarksLink = document.getElementById('bookmarks-link');
     const bookmarkCount = document.getElementById('bookmark-count');
@@ -229,7 +249,6 @@ function isActive(href: string): boolean {
   function initHeader() {
     const searchToggle = document.getElementById('search-toggle');
     const mobileBtn = document.getElementById('mobile-menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
 
     if (!searchToggle?.dataset.searchInit) {
       searchToggle?.setAttribute('data-search-init', 'true');
@@ -241,12 +260,8 @@ function isActive(href: string): boolean {
     if (!mobileBtn?.dataset.mobileInit) {
       mobileBtn?.setAttribute('data-mobile-init', 'true');
       mobileBtn?.addEventListener('click', () => {
-        const isOpen = mobileMenu?.classList.contains('hidden') === false;
-        mobileMenu?.classList.toggle('hidden');
-        mobileBtn.setAttribute('aria-expanded', String(!isOpen));
-        mobileBtn.innerHTML = !isOpen
-          ? '<span class="material-symbols-outlined" aria-hidden="true">close</span>'
-          : '<span class="material-symbols-outlined" aria-hidden="true">menu</span>';
+        const isOpen = mobileBtn.getAttribute('aria-expanded') === 'true';
+        setMobileOpen(!isOpen);
       });
     }
 
@@ -260,20 +275,38 @@ function isActive(href: string): boolean {
   // each time, so these are safe to register exactly once and never rebind.
   document.addEventListener('keydown', (event) => {
     const searchToggle = document.getElementById('search-toggle');
-    if (event.key === 'Escape' && searchToggle?.getAttribute('aria-expanded') === 'true') {
-      setSearchOpen(false, true);
+    const mobileBtn = document.getElementById('mobile-menu-btn');
+    if (event.key === 'Escape') {
+      if (searchToggle?.getAttribute('aria-expanded') === 'true') {
+        setSearchOpen(false, true);
+      }
+      if (mobileBtn?.getAttribute('aria-expanded') === 'true') {
+        setMobileOpen(false, true);
+      }
     }
   });
 
   document.addEventListener('click', (event) => {
     const desktopSearch = document.getElementById('desktop-search');
     const searchToggle = document.getElementById('search-toggle');
+    const mobileBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+
     if (
       searchToggle?.getAttribute('aria-expanded') === 'true'
       && event.target instanceof Node
       && !desktopSearch?.contains(event.target)
     ) {
       setSearchOpen(false);
+    }
+
+    if (
+      mobileBtn?.getAttribute('aria-expanded') === 'true'
+      && event.target instanceof Node
+      && !mobileMenu?.contains(event.target)
+      && !mobileBtn.contains(event.target)
+    ) {
+      setMobileOpen(false);
     }
   });
 

@@ -6,7 +6,7 @@ import StoryCard from '../components/ui/StoryCard.astro';
 import SeoBlurb from '../components/ui/SeoBlurb.astro';
 import PageHeading from '../components/ui/PageHeading.astro';
 import ViewToggle from '../components/ui/ViewToggle.astro';
-import { SITE_TITLE, SITE_DESCRIPTION, SITE_URL } from '../consts';
+import { SITE_TITLE, SITE_DESCRIPTION, SITE_URL, categoryUrlSlug } from '../consts';
 
 export const getStaticPaths = (async ({ paginate }) => {
   const stories = (await getCollection('stories')).sort(
@@ -35,7 +35,7 @@ const jsonLd =
         description: SITE_DESCRIPTION,
         potentialAction: {
           '@type': 'SearchAction',
-          target: `${SITE_URL}/search/?q={search_term_string}`,
+          target: `${SITE_URL}/search?q={search_term_string}`,
           'query-input': 'required name=search_term_string',
         },
       }
@@ -109,7 +109,7 @@ const jsonLd =
         and rolled into the <a href="/newsletter" class="underline hover:text-primary">weekly newsletter</a>.
       </p>
       <p>
-        Browse by <a href="/category/ui-ux-design" class="underline hover:text-primary">category</a> or
+        Browse by <a href={`/category/${categoryUrlSlug('ui-ux-design')}`} class="underline hover:text-primary">category</a> or
         subscribe via <a href="/rss.xml" data-astro-reload class="underline hover:text-primary">RSS</a> to
         follow along without checking back manually.
       </p>

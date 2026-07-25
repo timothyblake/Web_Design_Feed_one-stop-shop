@@ -32,6 +32,13 @@
   --color-outline: oklch(20% 0.01 30);
   --color-outline-variant: oklch(20% 0.01 30 / 20%);
 
+  --color-inverse-surface: oklch(20% 0.01 30);
+  --color-on-inverse-surface: oklch(98% 0.003 75);
+  --color-on-inverse-surface-variant: oklch(80% 0.006 75);
+
+  --shadow-divider-top: inset 0 1px 0 rgba(0, 0, 0, 0.15), 0 -1px 0 rgba(255, 255, 255, 0.8);
+  --shadow-divider-bottom: inset 0 -1px 0 rgba(0, 0, 0, 0.15), 0 1px 0 rgba(255, 255, 255, 0.8);
+
   --font-headline-xl: var(--font-headline), Arial, sans-serif;
   --font-headline-lg: var(--font-headline), Arial, sans-serif;
   --font-headline-md: var(--font-headline), Arial, sans-serif;
@@ -152,6 +159,12 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-on-surface-variant: oklch(80% 0.006 75);
     }
   }
 }

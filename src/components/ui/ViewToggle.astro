@@ -1,7 +1,7 @@
 ---
 // Switches every `[data-story-list]` on the page between the default
 // single-column list and a grid. Preference persists in localStorage so it
-// carries across full page navigations (this site has no client router).
+// carries across ClientRouter page navigations.
 // Plain CSS below (not Tailwind utilities) because the layout class is
 // applied at runtime via classList.toggle — Tailwind's build-time scanner
 // only sees literal classes in markup, so responsive utility strings
@@ -39,12 +39,6 @@
   @media (min-width: 640px) {
     [data-story-list].is-grid-view {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  @media (min-width: 1280px) {
-    [data-story-list].is-grid-view {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 

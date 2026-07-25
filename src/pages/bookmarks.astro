@@ -26,7 +26,9 @@ import ViewToggle from '../components/ui/ViewToggle.astro';
     icon on any story to save it here — saved locally in this browser.
   </p>
 
-  <ol id="bookmarks-list" data-story-list class="flex flex-col gap-stack-md list-none p-0 m-0" aria-live="polite"></ol>
+  <div id="bookmarks-status" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+  <ol id="bookmarks-list" data-story-list class="flex flex-col gap-stack-md list-none p-0 m-0"></ol>
 </BaseLayout>
 
 <script>
@@ -116,7 +118,7 @@ import ViewToggle from '../components/ui/ViewToggle.astro';
     footer.className = 'flex flex-wrap items-center gap-2 mt-auto pt-3';
 
     const categoryPill = document.createElement('a');
-    categoryPill.href = `/category/${categoryUrlSlug(item.category)}/`;
+    categoryPill.href = `/category/${categoryUrlSlug(item.category)}`;
     categoryPill.className = `${categoryPillClass(item.category)} text-on-secondary font-label-md text-label-md px-2 py-1 rounded uppercase tracking-wider text-[10px] font-bold hover:opacity-90 transition-opacity`;
     categoryPill.textContent = categoryLabel(item.category);
 
@@ -129,6 +131,10 @@ import ViewToggle from '../components/ui/ViewToggle.astro';
       removeBookmark(item.url);
       li.remove();
       renderEmptyState();
+      const status = document.getElementById('bookmarks-status');
+      if (status) {
+        status.textContent = `Removed "${item.title}" from bookmarks`;
+      }
     });
 
     footer.append(categoryPill, removeBtn);

@@ -1,9 +1,9 @@
 import { defineCollection } from 'astro:content';
 import { z } from 'astro/zod';
 import { sanityStoriesLoader } from './loaders/sanityStories';
-import { CATEGORIES } from './consts';
+import { CATEGORIES, type CategorySlug } from './consts';
 
-const categorySlugs = CATEGORIES.map((c) => c.slug) as [string, ...string[]];
+const categorySlugs = CATEGORIES.map((c) => c.slug) as [CategorySlug, ...CategorySlug[]];
 
 // Content Layer API (Astro 5+): loader-based collection. Stories live in
 // Sanity now — the loader fetches them via GROQ at build/dev time. `image`

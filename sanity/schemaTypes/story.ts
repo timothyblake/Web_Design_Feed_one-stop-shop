@@ -1,14 +1,12 @@
 import { defineField, defineType } from 'sanity';
+import { CATEGORIES } from '../../src/consts';
 
-// Kept in sync with the CATEGORIES slugs in src/consts.ts — update both
-// places together if categories ever change.
-const CATEGORY_OPTIONS = [
-  { title: 'UI & UX Design', value: 'ui-ux-design' },
-  { title: 'Front-end', value: 'front-end' },
-  { title: 'Back-end', value: 'back-end' },
-  { title: 'Resources', value: 'resources' },
-  { title: 'Business', value: 'business' },
-];
+// Dynamically derived from CATEGORIES in src/consts.ts — ensuring Sanity Studio options
+// stay perfectly in sync with the front-end category slugs and labels.
+const CATEGORY_OPTIONS = CATEGORIES.map((c) => ({
+  title: c.label,
+  value: c.slug,
+}));
 
 export default defineType({
   name: 'story',

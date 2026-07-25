@@ -1,0 +1,94 @@
+---
+import type { GetStaticPaths, Page } from 'astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import StoryCard from '../../../components/ui/StoryCard.astro';
+import Breadcrumb from '../../../components/ui/Breadcrumb.astro';
+import PageHeading from '../../../components/ui/PageHeading.astro';
+import ViewToggle from '../../../components/ui/ViewToggle.astro';
+
+// SEO NOTE: Tag pages intentionally set `noindex` and omit JSON-LD schemas,
+// activeCategory highlights, or custom SEO blurbs. This deliberate SEO strategy
+// avoids thin-content / duplicate-content indexation across dozens of dynamic
+// tag combinations, concentrating indexation equity on primary taxonomy category pages.
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const stories = await getCollection('stories');
+  const tags = Array.from(new Set(stories.flatMap((s) => s.data.tags)));
+
+  return tags.flatMap((tag) => {
+    const tagStories = stories
+      .filter((s) => s.data.tags.includes(tag))
+      .sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf());
+
+    return paginate(tagStories, {
+      params: { slug: tag },
+      props: { tag },
+      pageSize: 10,
+    });
+  });
+}) satisfies GetStaticPaths;
+
+interface Props {
+  page: Page<CollectionEntry<'stories'>>;
+  tag: string;
+}
+
+const { page, tag } = Astro.props;
+const title = page.currentPage === 1 ? `#${tag}` : `#${tag} — Page ${page.currentPage}`;
+---
+
+<BaseLayout
+  title={title}
+  description={`Stories tagged #${tag} on Web Design Feed.`}
+  noindex
+>
+  <Breadcrumb items={[{ label: `#${tag}`, href: `/tag/${tag}` }]} />
+
+  <PageHeading>
+    #{tag}{page.currentPage > 1 ? ` — Page ${page.currentPage}` : ''}
+    <ViewToggle slot="actions" />
+  </PageHeading>
+
+  <ol data-story-list class="flex flex-col gap-stack-md list-none p-0 m-0">
+    {page.data.map((story, i) => (
+      <li>
+        <StoryCard story={story} priority={page.currentPage === 1 && i < 3} />
+      </li>
+    ))}
+  </ol>
+
+  {page.data.length === 0 && (
+    <p class="text-on-surface-variant py-stack-lg text-center">No stories found with tag #{tag}.</p>
+  )}
+
+  {page.lastPage > 1 && (
+    <nav aria-label="Pagination" class="mt-8 flex items-center justify-center gap-3 border-t border-outline pt-8 pb-4">
+      {page.url.prev ? (
+        <a
+          href={page.url.prev}
+          class="border border-outline text-primary font-label-md text-label-md px-5 py-2.5 rounded-lg hover:bg-surface-variant transition-all font-semibold"
+        >
+          Previous
+        </a>
+      ) : (
+        <span aria-hidden="true" class="px-5 py-2.5 opacity-0">Previous</span>
+      )}
+
+      <span class="text-on-surface-variant text-sm">
+        Page {page.currentPage} of {page.lastPage}
+      </span>
+
+      {page.url.next ? (
+        <a
+          href={page.url.next}
+          class="bg-secondary text-on-secondary font-label-md text-label-md px-6 py-2.5 rounded-lg hover:opacity-90 transition-all shadow-sm font-semibold"
+        >
+          Next
+        </a>
+      ) : (
+        <span aria-hidden="true" class="px-6 py-2.5 opacity-0">Next</span>
+      )}
+    </nav>
+  )}
+</BaseLayout>

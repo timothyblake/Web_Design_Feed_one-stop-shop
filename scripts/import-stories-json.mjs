@@ -18,9 +18,10 @@ import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { createClient } from '@sanity/client';
+import { CATEGORIES } from '../src/consts.js';
 
-// Kept in sync with src/consts.ts CATEGORIES and sanity/schemaTypes/story.ts.
-const VALID_CATEGORIES = ['ui-ux-design', 'front-end', 'back-end', 'resources', 'business'];
+// Derived dynamically from src/consts.ts CATEGORIES
+const VALID_CATEGORIES = CATEGORIES.map((c) => c.slug);
 const REQUIRED_FIELDS = ['title', 'url', 'description', 'source', 'category'];
 
 const inputPath = process.argv[2] ?? 'scripts/stories.example.json';

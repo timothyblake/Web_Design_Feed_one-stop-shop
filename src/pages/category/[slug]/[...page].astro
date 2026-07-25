@@ -1,0 +1,126 @@
+---
+import type { GetStaticPaths, Page } from 'astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import StoryCard from '../../../components/ui/StoryCard.astro';
+import Breadcrumb from '../../../components/ui/Breadcrumb.astro';
+import SeoBlurb from '../../../components/ui/SeoBlurb.astro';
+import PageHeading from '../../../components/ui/PageHeading.astro';
+import ViewToggle from '../../../components/ui/ViewToggle.astro';
+import {
+  CATEGORIES,
+  categoryPageTitle,
+  categoryUrlSlug,
+  CATEGORY_BLURBS,
+  CATEGORY_DESCRIPTIONS,
+  type CategorySlug,
+  SITE_URL,
+} from '../../../consts';
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const stories = await getCollection('stories');
+  return CATEGORIES.flatMap((category) => {
+    const categoryStories = stories
+      .filter((s) => s.data.category === category.slug)
+      .sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf());
+
+    return paginate(categoryStories, {
+      params: { slug: categoryUrlSlug(category.slug) },
+      props: { categorySlug: category.slug },
+      pageSize: 10,
+    });
+  });
+}) satisfies GetStaticPaths;
+
+interface Props {
+  page: Page<CollectionEntry<'stories'>>;
+  categorySlug: CategorySlug;
+}
+
+const { page, categorySlug } = Astro.props;
+const urlSlug = categoryUrlSlug(categorySlug);
+const baseLabel = categoryPageTitle(categorySlug);
+const label = page.currentPage === 1 ? baseLabel : `${baseLabel} — Page ${page.currentPage}`;
+const blurb = CATEGORY_BLURBS[categorySlug];
+const shortDescription = CATEGORY_DESCRIPTIONS[categorySlug];
+const description = `The latest ${baseLabel} stories — curated links to the best articles across the web.`;
+
+const jsonLd =
+  page.currentPage === 1
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        name: `${baseLabel} stories`,
+        url: `${SITE_URL}/category/${urlSlug}`,
+        itemListElement: page.data.map((story, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          url: story.data.url,
+          name: story.data.title,
+        })),
+      }
+    : undefined;
+---
+
+<BaseLayout title={label} description={description} activeCategory={categorySlug} structuredData={jsonLd}>
+  <Breadcrumb items={[{ label: baseLabel, href: `/category/${urlSlug}` }]} />
+
+  <PageHeading>
+    {label}
+    <ViewToggle slot="actions" />
+  </PageHeading>
+
+  {page.currentPage === 1 && (
+    <p class="text-on-surface-variant mb-stack-md text-sm leading-relaxed">
+      {shortDescription}
+    </p>
+  )}
+
+  <ol data-story-list class="flex flex-col gap-stack-md list-none p-0 m-0">
+    {page.data.map((story, i) => (
+      <li>
+        <StoryCard story={story} priority={page.currentPage === 1 && i < 3} />
+      </li>
+    ))}
+  </ol>
+
+  {page.data.length === 0 && (
+    <p class="text-on-surface-variant py-stack-lg text-center">No {baseLabel} stories yet — check back soon.</p>
+  )}
+
+  {page.lastPage > 1 && (
+    <nav aria-label="Pagination" class="mt-8 flex items-center justify-center gap-3 border-t border-outline pt-8 pb-4">
+      {page.url.prev ? (
+        <a
+          href={page.url.prev}
+          class="border border-outline text-primary font-label-md text-label-md px-5 py-2.5 rounded-lg hover:bg-surface-variant transition-all font-semibold"
+        >
+          Previous
+        </a>
+      ) : (
+        <span aria-hidden="true" class="px-5 py-2.5 opacity-0">Previous</span>
+      )}
+
+      <span class="text-on-surface-variant text-sm">
+        Page {page.currentPage} of {page.lastPage}
+      </span>
+
+      {page.url.next ? (
+        <a
+          href={page.url.next}
+          class="bg-secondary text-on-secondary font-label-md text-label-md px-6 py-2.5 rounded-lg hover:opacity-90 transition-all shadow-sm font-semibold"
+        >
+          Next
+        </a>
+      ) : (
+        <span aria-hidden="true" class="px-6 py-2.5 opacity-0">Next</span>
+      )}
+    </nav>
+  )}
+
+  {page.currentPage === 1 && (
+    <SeoBlurb title={`About ${baseLabel} on Web Design Feed`}>
+      {blurb.map((paragraph) => <p>{paragraph}</p>)}
+    </SeoBlurb>
+  )}
+</BaseLayout>
