@@ -66,7 +66,7 @@ const shareMenuId = `share-menu-${story.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
         src={`${image}?w=800&h=420&fit=crop&auto=format`}
         srcset={`${image}?w=400&h=210&fit=crop&auto=format 400w, ${image}?w=800&h=420&fit=crop&auto=format 800w, ${image}?w=1200&h=630&fit=crop&auto=format 1200w`}
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 800px"
-        alt={imageAlt ?? ''}
+        alt={imageAlt ?? title}
         width="800"
         height="420"
         decoding="async"

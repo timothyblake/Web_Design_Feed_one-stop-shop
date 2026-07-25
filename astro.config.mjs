@@ -31,6 +31,8 @@ export default defineConfig({
     // The front-end category page moved from /category/front-end to
     // /category/front-end-development when its page title changed.
     '/category/front-end': '/category/front-end-development',
+    '/category/back-end': '/category/web-development',
+    '/category/web-dev': '/category/web-development',
     '/category/ui-design': '/category/ui-ux-design',
     '/category/career': '/category/business',
     '/category/tools': '/category/resources',
@@ -39,7 +41,12 @@ export default defineConfig({
     mdx(),
     sitemap({
       filter: (page) =>
-        !page.includes('/newsletter/success') && !page.includes('/404') && !page.includes('/studio'),
+        !page.includes('/newsletter/success') &&
+        !page.includes('/404') &&
+        !page.includes('/studio') &&
+        !page.includes('/search') &&
+        !page.includes('/bookmarks') &&
+        !page.includes('/tag/'),
     }),
     sanity({
       projectId: env.PUBLIC_SANITY_PROJECT_ID || 'your-project-id',

@@ -107,6 +107,7 @@ function isActive(href: string): boolean {
   <div
     id="mobile-menu"
     class="hidden md:hidden absolute top-full left-0 w-full max-h-[calc(100vh-4rem)] overflow-y-auto bg-surface border-b border-[#dee2e6] shadow-lg transition-all duration-300 origin-top"
+    inert
   >
     <nav aria-label="Mobile" class="flex flex-col p-4 gap-2">
       <form action="/search" method="get" class="relative w-full mb-4" role="search">
@@ -116,7 +117,7 @@ function isActive(href: string): boolean {
           type="search"
           name="q"
           placeholder="Search articles..."
-          class="w-full pl-4 pr-4 py-2 rounded-lg border border-[#dee2e6] bg-transparent text-body-md text-primary focus:outline-none"
+          class="w-full pl-4 pr-4 py-2 rounded-lg border border-[#dee2e6] bg-transparent text-body-md text-primary focus:outline-none focus-visible:ring-1 focus-visible:ring-outline"
         />
       </form>
 
@@ -219,6 +220,7 @@ function isActive(href: string): boolean {
     if (!mobileBtn || !mobileMenu) return;
 
     mobileMenu.classList.toggle('hidden', !open);
+    mobileMenu.toggleAttribute('inert', !open);
     mobileBtn.setAttribute('aria-expanded', String(open));
     mobileBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
     mobileBtn.innerHTML = open
