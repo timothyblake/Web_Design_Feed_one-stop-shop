@@ -18,25 +18,26 @@ export const getStaticPaths = (async ({ paginate }) => {
 const { page } = Astro.props as { page: Page<CollectionEntry<'stories'>> };
 
 const title = page.currentPage === 1
-  ? 'Featured'
-  : `Featured Stories — Page ${page.currentPage}`;
+  ? "Editor's Choice: Standout Design & Development Stories"
+  : `Editor's Choice — Page ${page.currentPage}`;
 ---
 
 <BaseLayout
   title={title}
-  description="Editor's picks — the stories that make it into the weekly newsletter digest."
+  description="Discover standout UI, UX, web design, and development stories selected by the Web Design Feed editor for their insight, originality, and practical value."
 >
   <Breadcrumb items={[{ label: 'Featured', href: '/featured' }]} />
 
   <PageHeading>
-    {page.currentPage === 1 ? "Editor's Picks" : `Editor's Picks — Page ${page.currentPage}`}
+    {page.currentPage === 1 ? "Editor's Choice: Standout Design & Development Stories" : `Editor's Choice — Page ${page.currentPage}`}
     <ViewToggle slot="actions" />
   </PageHeading>
-  <p class="text-on-surface-variant mb-stack-md text-sm">
-    The best stories of the week, hand-picked. Powers the <a href="/newsletter" class="underline hover:text-primary">weekly digest</a>.
+  <p class="text-on-surface-variant mb-stack-md text-sm leading-relaxed">
+    A hand-picked collection of useful, original, and thought-provoking stories for people who design,
+    build, and shape the web.
   </p>
 
-  <ol data-story-list class="flex flex-col gap-stack-md list-none p-0 m-0">
+  <ol data-story-list class="is-grid-view flex flex-col gap-stack-md list-none p-0 m-0">
     {page.data.map((story, i) => (
       <li>
         <StoryCard story={story} priority={page.currentPage === 1 && i < 3} />
@@ -45,7 +46,7 @@ const title = page.currentPage === 1
   </ol>
 
   {page.data.length === 0 && (
-    <p class="text-on-surface-variant py-stack-lg text-center">No featured stories yet this week.</p>
+    <p class="text-on-surface-variant py-stack-lg text-center">No Editor's Choice stories are available yet.</p>
   )}
 
   {page.lastPage > 1 && (
@@ -79,18 +80,19 @@ const title = page.currentPage === 1
   )}
 
   {page.currentPage === 1 && (
-    <SeoBlurb title="About Featured Stories on Web Design Feed">
+    <SeoBlurb title="About Editor's Choice on Web Design Feed">
       <p>
-        Featured stories are the editor's picks from across UI and UX design, front-end and back-end
-        development, resources, and business.
+        Editor's Choice brings together standout stories from UI and UX design, front-end and back-end
+        development, creative resources, and the business of building for the web.
       </p>
       <p>
         Each selection is chosen for its practical insight, original thinking, or usefulness to people who
         design and build for the web.
       </p>
       <p>
-        Browse the latest picks here or get the highlights delivered in the weekly newsletter digest. Every
-        story links directly to the original author and source.
+        Browse the latest selections here or get the highlights delivered in the
+        <a href="/newsletter" class="underline hover:text-primary">monthly update</a>. Every story links
+        directly to the original author and source.
       </p>
     </SeoBlurb>
   )}

@@ -245,7 +245,7 @@ The original article URL is the story's primary link. There are intentionally no
 | `/2`, `/3`, etc. | `src/pages/[...page].astro` | Indexed | Additional feed pages when enough stories exist. |
 | `/featured` | `src/pages/featured.astro` | Indexed | Stories marked `featured: true`. |
 | `/feeds` | `src/pages/feeds.astro` | Indexed | Landing page for the complete and featured-only RSS feeds. |
-| `/category/:slug` | `src/pages/category/[slug].astro` | Indexed | Statically generated archive for each configured category. |
+| `/:category-slug` | `src/pages/[slug]/[...page].astro` | Indexed | Statically generated archive for each configured category. |
 | `/tag/:slug` | `src/pages/tag/[slug].astro` | Noindex | Statically generated archive for every tag found in Sanity stories. |
 | `/search` | `src/pages/search.astro` | Noindex | Pagefind search interface in production builds. |
 | `/bookmarks` | `src/pages/bookmarks.astro` | Noindex | Browser-local saved stories. |
@@ -332,7 +332,7 @@ To add a category:
 4. Update `CATEGORY_OPTIONS` in `sanity/schemaTypes/story.ts`.
 5. Add or update Sanity story documents using the new slug.
 6. Run `npm run check`; the `Record<CategorySlug, ...>` types will catch missing category copy.
-7. Run `npm run build` and inspect the generated `/category/<slug>` route.
+7. Run `npm run build` and inspect the generated `/<category-slug>` route.
 
 The Astro content schema derives its enum from `CATEGORIES`, while Studio maintains a matching category option list. Keep both definitions synchronized so Studio authors can select every supported category and builds reject unrecognized values.
 

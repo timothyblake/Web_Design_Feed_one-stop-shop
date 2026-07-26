@@ -54,7 +54,7 @@ const jsonLd =
     </p>
   )}
 
-  <ol data-story-list class="flex flex-col gap-stack-md list-none p-0 m-0">
+  <ol data-story-list class="is-grid-view flex flex-col gap-stack-md list-none p-0 m-0">
     {page.data.map((story, i) => (
       <li>
         <StoryCard story={story} priority={page.currentPage === 1 && i < 3} />
@@ -109,7 +109,7 @@ const jsonLd =
         and rolled into the <a href="/newsletter" class="underline hover:text-primary">weekly newsletter</a>.
       </p>
       <p>
-        Browse by <a href={`/category/${categoryUrlSlug('ui-ux-design')}`} class="underline hover:text-primary">category</a> or
+        Browse by <a href={`/${categoryUrlSlug('ui-ux-design')}`} class="underline hover:text-primary">category</a> or
         subscribe via <a href="/rss.xml" data-astro-reload class="underline hover:text-primary">RSS</a> to
         follow along without checking back manually.
       </p>

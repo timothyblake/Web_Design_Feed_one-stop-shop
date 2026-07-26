@@ -5,6 +5,8 @@ import { SITE_TITLE, SITE_DESCRIPTION, TWITTER_HANDLE } from '../../consts';
 interface Props {
   title: string;
   description?: string;
+  /** Overrides `description` for og:description only (e.g. a punchier social-share blurb). */
+  ogDescription?: string;
   /** Set when the canonical differs from Astro.url (e.g. paginated pages page 1). */
   canonicalUrl?: URL | string;
   ogType?: 'website' | 'article';
@@ -18,6 +20,7 @@ interface Props {
 const {
   title,
   description = SITE_DESCRIPTION,
+  ogDescription = description,
   canonicalUrl,
   ogType = 'website',
   ogImage = '/og-default.png',
@@ -55,7 +58,7 @@ const schemas = structuredData ? (Array.isArray(structuredData) ? structuredData
 <!-- Open Graph -->
 <meta property="og:type" content={ogType} />
 <meta property="og:title" content={pageTitle} />
-<meta property="og:description" content={description} />
+<meta property="og:description" content={ogDescription} />
 <meta property="og:url" content={canonical} />
 <meta property="og:site_name" content={SITE_TITLE} />
 <meta property="og:image" content={ogImageUrl} />

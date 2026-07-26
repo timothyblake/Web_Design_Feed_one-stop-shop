@@ -28,14 +28,15 @@ export default defineConfig({
     inlineStylesheets: 'auto',
   },
   redirects: {
-    // The front-end category page moved from /category/front-end to
-    // /category/front-end-development when its page title changed.
-    '/category/front-end': '/category/front-end-development',
-    '/category/back-end': '/category/web-development',
-    '/category/web-dev': '/category/web-development',
-    '/category/ui-design': '/category/ui-ux-design',
-    '/category/career': '/category/business',
-    '/category/tools': '/category/resources',
+    // Preserve legacy taxonomy links while category archives move to clean,
+    // root-level permalinks.
+    '/category/front-end': '/front-end-development',
+    '/category/back-end': '/web-development',
+    '/category/web-dev': '/web-development',
+    '/category/ui-design': '/ui-ux-design',
+    '/category/career': '/business',
+    '/category/tools': '/resources',
+    '/category/[slug]/[...page]': '/[slug]/[...page]',
   },
   integrations: [
     mdx(),

@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { categoryLabel, categoryPillClass, categoryUrlSlug } from '../../consts';
+import { categoryLabel, categoryPillClass, categoryUrlSlug, TWITTER_HANDLE } from '../../consts';
 import { relativeTime, formatDate } from '../../utils/formatDate';
 import Icon from './Icon.astro';
 
@@ -33,9 +33,17 @@ const faviconUrl = hostname
   : undefined;
 
 const shareText = `${title} — via ${source}`;
-const twitterShareUrl = `https://twitter.com/intent/tweet?${new URLSearchParams({ url, text: shareText }).toString()}`;
+const twitterShareUrl = `https://twitter.com/intent/tweet?${new URLSearchParams({
+  url,
+  text: shareText,
+  via: TWITTER_HANDLE.replace('@', ''),
+}).toString()}`;
 const linkedInShareUrl = `https://www.linkedin.com/sharing/share-offsite/?${new URLSearchParams({ url }).toString()}`;
 const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSearchParams({ u: url }).toString()}`;
+const emailShareUrl = `mailto:?${new URLSearchParams({
+  subject: title,
+  body: `${description}\n\n${url}`,
+}).toString()}`;
 const shareMenuId = `share-menu-${story.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
 ---
 
@@ -118,8 +126,8 @@ const shareMenuId = `share-menu-${story.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
 
   <div class="flex flex-wrap items-center gap-2 mt-auto pt-3">
     <a
-      href={`/category/${categoryUrlSlug(category)}`}
-      class={`${categoryPillClass(category)} text-on-secondary font-label-md text-label-md px-2 py-1 rounded uppercase tracking-wider text-[10px] font-bold hover:opacity-90 transition-opacity`}
+      href={`/${categoryUrlSlug(category)}`}
+      class={`story-category-pill ${categoryPillClass(category)} text-on-secondary font-label-md text-label-md px-2 py-1 rounded uppercase tracking-wider text-[10px] font-bold hover:opacity-90 transition-opacity`}
     >
       {categoryLabel(category)}
     </a>
@@ -192,6 +200,13 @@ const shareMenuId = `share-menu-${story.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
             <span class="w-5 h-5 shrink-0 rounded bg-[#1877F2] text-white flex items-center justify-center text-[11px] font-bold" aria-hidden="true">f</span>
             Share on Facebook
           </a>
+          <a
+            href={emailShareUrl}
+            class="flex items-center gap-2 px-3 py-2 text-sm text-primary hover:bg-surface-variant transition-colors"
+          >
+            <Icon name="mail" size={18} class="w-5 shrink-0" />
+            Share by email
+          </a>
           <button
             type="button"
             class="share-native-item hidden items-center gap-2 px-3 py-2 text-sm w-full text-left text-primary hover:bg-surface-variant transition-colors"
@@ -228,14 +243,16 @@ const shareMenuId = `share-menu-${story.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
 
     btn.setAttribute('aria-pressed', String(saved));
     btn.setAttribute('aria-label', `${saved ? 'Remove' : 'Save'} "${title}" ${saved ? 'from' : 'to'} bookmarks`);
+    btn.classList.toggle('text-primary', !saved);
+    btn.classList.toggle('text-secondary', saved);
     const path = icon?.querySelector('path');
     const nextD = saved ? icon?.dataset.pathFill : icon?.dataset.pathOutline;
     if (path && nextD) path.setAttribute('d', nextD);
   }
 
-  // Share is a popover of explicit social destinations (X, LinkedIn, Facebook,
+  // Share is a popover of explicit destinations (X, LinkedIn, Facebook, email,
   // copy link) rather than a bare Web Share API call, so desktop users — who
-  // have no native share sheet — still get one-click posting to social sites.
+  // have no native share sheet — still get one-click sharing options.
   function closeAllShareMenus(except?: HTMLElement, returnFocus = false) {
     document.querySelectorAll<HTMLElement>('.share-menu').forEach((menu) => {
       if (menu === except) return;

@@ -1,6 +1,6 @@
 ---
-// Switches every `[data-story-list]` on the page between the default
-// single-column list and a grid. Preference persists in localStorage so it
+// Switches every `[data-story-list]` on the page between the default grid
+// and a single-column list. Preference persists in localStorage so it
 // carries across ClientRouter page navigations.
 // Plain CSS below (not Tailwind utilities) because the layout class is
 // applied at runtime via classList.toggle — Tailwind's build-time scanner
@@ -13,20 +13,20 @@ import Icon from './Icon.astro';
   <button
     type="button"
     class="view-toggle-btn p-1.5 rounded-lg text-primary hover:bg-surface-variant transition-colors"
-    data-view-btn="list"
+    data-view-btn="grid"
     aria-pressed="true"
-    aria-label="List view"
+    aria-label="Grid view"
   >
-    <Icon name="view_list" size={20} />
+    <Icon name="grid_view" size={20} />
   </button>
   <button
     type="button"
     class="view-toggle-btn p-1.5 rounded-lg text-primary hover:bg-surface-variant transition-colors"
-    data-view-btn="grid"
+    data-view-btn="list"
     aria-pressed="false"
-    aria-label="Grid view"
+    aria-label="List view"
   >
-    <Icon name="grid_view" size={20} />
+    <Icon name="view_list" size={20} />
   </button>
 </div>
 
@@ -53,6 +53,15 @@ import Icon from './Icon.astro';
     flex: 1;
     width: 100%;
   }
+
+  [data-story-list].is-grid-view .story-category-pill {
+    background-color: var(--color-accent-ink);
+  }
+
+  [data-story-list].is-grid-view > li:nth-child(4n + 1) .story-category-pill,
+  [data-story-list].is-grid-view > li:nth-child(4n + 4) .story-category-pill {
+    background-color: var(--color-secondary);
+  }
 </style>
 
 <script>
@@ -74,7 +83,7 @@ import Icon from './Icon.astro';
 
   function initViewToggle() {
     const stored = localStorage.getItem(STORAGE_KEY);
-    applyView(stored === 'grid' ? 'grid' : 'list');
+    applyView(stored === 'list' ? 'list' : 'grid');
 
     document.querySelectorAll<HTMLButtonElement>('[data-view-btn]').forEach((btn) => {
       if (btn.dataset.viewInit) return;

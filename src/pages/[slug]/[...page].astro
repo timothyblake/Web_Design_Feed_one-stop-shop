@@ -1,12 +1,12 @@
 ---
 import type { GetStaticPaths, Page } from 'astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
-import BaseLayout from '../../../layouts/BaseLayout.astro';
-import StoryCard from '../../../components/ui/StoryCard.astro';
-import Breadcrumb from '../../../components/ui/Breadcrumb.astro';
-import SeoBlurb from '../../../components/ui/SeoBlurb.astro';
-import PageHeading from '../../../components/ui/PageHeading.astro';
-import ViewToggle from '../../../components/ui/ViewToggle.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StoryCard from '../../components/ui/StoryCard.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
+import SeoBlurb from '../../components/ui/SeoBlurb.astro';
+import PageHeading from '../../components/ui/PageHeading.astro';
+import ViewToggle from '../../components/ui/ViewToggle.astro';
 import {
   CATEGORIES,
   categoryPageTitle,
@@ -15,7 +15,7 @@ import {
   CATEGORY_DESCRIPTIONS,
   type CategorySlug,
   SITE_URL,
-} from '../../../consts';
+} from '../../consts';
 
 export const getStaticPaths = (async ({ paginate }) => {
   const stories = await getCollection('stories');
@@ -51,7 +51,7 @@ const jsonLd =
         '@context': 'https://schema.org',
         '@type': 'ItemList',
         name: `${baseLabel} stories`,
-        url: `${SITE_URL}/category/${urlSlug}`,
+        url: `${SITE_URL}/${urlSlug}`,
         itemListElement: page.data.map((story, i) => ({
           '@type': 'ListItem',
           position: i + 1,
@@ -63,7 +63,7 @@ const jsonLd =
 ---
 
 <BaseLayout title={label} description={description} activeCategory={categorySlug} structuredData={jsonLd}>
-  <Breadcrumb items={[{ label: baseLabel, href: `/category/${urlSlug}` }]} />
+  <Breadcrumb items={[{ label: baseLabel, href: `/${urlSlug}` }]} />
 
   <PageHeading>
     {label}
@@ -76,7 +76,7 @@ const jsonLd =
     </p>
   )}
 
-  <ol data-story-list class="flex flex-col gap-stack-md list-none p-0 m-0">
+  <ol data-story-list class="is-grid-view flex flex-col gap-stack-md list-none p-0 m-0">
     {page.data.map((story, i) => (
       <li>
         <StoryCard story={story} priority={page.currentPage === 1 && i < 3} />

@@ -8,28 +8,31 @@ import Icon from '../components/ui/Icon.astro';
 
 <BaseLayout
   title="Newsletter"
-  description="Subscribe to the weekly Web Design Feed digest — the best UI design, front-end and back-end stories, every Friday."
+  description="Subscribe to the monthly Web Design Feed update for standout design and development stories, useful resources, and fresh inspiration."
 >
   <Breadcrumb items={[{ label: 'Newsletter', href: '/newsletter' }]} />
 
-  <PageHeading>The Weekly Digest</PageHeading>
+  <PageHeading>The Monthly Update</PageHeading>
   <p class="text-on-surface-variant mb-stack-lg leading-relaxed">
-    Once a week, we round up the <a href="/featured" class="underline hover:text-primary">editor's picks</a>
-    from the site into a single email. No algorithm, no noise — just the stories worth your Friday coffee.
+    Once a month, we bring together standout <a href="/featured" class="underline hover:text-primary">editor's picks</a>,
+    practical resources, and fresh inspiration in one useful email. No algorithm, no noise — just the stories worth your time.
   </p>
 
   <NewsletterCTA />
 
-  <section class="mt-stack-lg" aria-labelledby="past-issues-heading">
-    <h2 id="past-issues-heading" class="font-headline-md font-bold text-primary text-lg mb-2">
-      Past issues
+  <section class="mt-stack-lg" aria-labelledby="rss-option-heading">
+    <h2 id="rss-option-heading" class="font-headline-md font-bold text-primary text-lg mb-2">
+      Prefer to follow every update?
     </h2>
-    <p class="text-on-surface-variant text-sm">
-      The archive lives on Buttondown —
-      <a href="https://buttondown.email/webdesignfeed/archive" class="underline hover:text-primary" target="_blank" rel="noopener noreferrer">
-        browse past issues
-        <Icon name="open_in_new" size={15} class="ml-[5px] align-middle inline" />
-      </a>.
+    <p class="text-on-surface-variant text-sm leading-relaxed mb-4">
+      Subscribe through RSS to get new Web Design Feed stories directly in your preferred feed reader.
     </p>
+    <a
+      href="/feeds"
+      class="inline-flex items-center gap-2 border border-outline text-primary font-label-md text-label-md px-5 py-2.5 rounded-lg hover:bg-surface-variant transition-colors font-semibold"
+    >
+      <Icon name="rss_feed" size={18} />
+      Explore RSS feeds
+    </a>
   </section>
 </BaseLayout>

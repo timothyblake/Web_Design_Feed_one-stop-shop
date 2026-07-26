@@ -11,7 +11,7 @@ const { activeCategory } = Astro.props;
 ---
 
 <aside
-  class="hidden lg:flex flex-col gap-stack-md py-stack-lg w-64 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto pr-gutter shadow-[inset_-1px_0_0_rgba(0,0,0,0.15),1px_0_0_rgba(255,255,255,0.8)]"
+  class="hidden lg:flex flex-col gap-stack-md py-stack-lg w-64 shrink-0 sticky top-16 self-start h-[calc(100vh-4rem)] overflow-y-auto pr-gutter shadow-[inset_-1px_0_0_rgba(0,0,0,0.15),1px_0_0_rgba(255,255,255,0.8)]"
 >
   <div class="px-3 mb-2">
     <h2
@@ -40,7 +40,7 @@ const { activeCategory } = Astro.props;
     {
       CATEGORIES.map((category) => (
         <a
-          href={`/category/${categoryUrlSlug(category.slug)}`}
+          href={`/${categoryUrlSlug(category.slug)}`}
           aria-current={activeCategory === category.slug ? "page" : undefined}
           class={`rounded-xl p-3 font-label-md text-label-md flex items-center gap-3 transition-colors ${
             activeCategory === category.slug
@@ -73,7 +73,7 @@ const { activeCategory } = Astro.props;
       <p
         class="font-body-md text-body-md text-on-surface-variant mb-4 text-sm leading-snug"
       >
-        Get the best of the web design feed delivered weekly.
+        Get the best of Web Design Feed delivered to your inbox
       </p>
       <a
         href="/newsletter"

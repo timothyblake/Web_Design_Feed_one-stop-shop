@@ -15,7 +15,7 @@ export const CATEGORIES = [
   { slug: 'business', label: 'Business', icon: 'work', pill: 'secondary' },
 ] as const;
 
-// Longer-form title for the /category/ page itself (<h1>, <title>, breadcrumb).
+// Longer-form title for the root-level category page itself (<h1>, <title>, breadcrumb).
 // Falls back to the short `label` used everywhere else (sidenav, story pills).
 const CATEGORY_PAGE_TITLES: Partial<Record<(typeof CATEGORIES)[number]['slug'], string>> = {
   'front-end': 'Front-end Development',
@@ -52,7 +52,7 @@ export const CATEGORY_DESCRIPTIONS: Record<CategorySlug, string> = {
     'Explore freelancing, agencies, pricing, client relationships, product strategy, leadership, and sustainable design and development businesses.',
 };
 
-// Unique per-category copy for the SEO blurb block on each /category/ page —
+// Unique per-category copy for the SEO blurb block on each category page —
 // keeps those pages from reading as thin, near-duplicate content.
 export const CATEGORY_BLURBS: Record<CategorySlug, string[]> = {
   'ui-ux-design': [
@@ -97,7 +97,7 @@ export function categoryPageTitle(slug: string): string {
   return CATEGORY_PAGE_TITLES[normalizedSlug as CategorySlug] ?? categoryLabel(normalizedSlug);
 }
 
-// The /category/ URL segment, slugified from categoryPageTitle — matches the
+// The root-level URL segment, slugified from categoryPageTitle — matches the
 // existing short slug for every category except front-end, which now has a
 // longer page title and therefore a longer URL.
 export function categoryUrlSlug(slug: string): string {
