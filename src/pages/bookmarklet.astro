@@ -1,0 +1,91 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from '../components/ui/Breadcrumb.astro';
+import PageHeading from '../components/ui/PageHeading.astro';
+
+function createBookmarklet(studioBaseUrl: string): string {
+  return `javascript:(()=>{const studio=${JSON.stringify(studioBaseUrl)};const pick=(...selectors)=>{for(const selector of selectors){const value=document.querySelector(selector)?.getAttribute('content')?.trim();if(value)return value}return''};const clean=(value,max)=>value.replace(/\\s+/g,' ').trim().slice(0,max);const payload={title:clean(pick('meta[property="og:title"]','meta[name="twitter:title"]','meta[name="title"]')||document.title,150),url:location.href,description:clean(pick('meta[property="og:description"]','meta[name="twitter:description"]','meta[name="description"]'),280),source:clean(pick('meta[property="og:site_name"]')||location.hostname.replace(/^www\\./,''),100)};const bytes=encodeURIComponent(JSON.stringify(payload)).replace(/%([0-9A-F]{2})/g,(_,hex)=>String.fromCharCode(parseInt(hex,16)));const encoded=btoa(bytes).replace(/\\//g,'_').replace(/\\+/g,'-').replace(/=+$/,'');window.open(studio+'#/intent/create/type=story;template=story-from-bookmarklet/'+encoded,'_blank','noopener,noreferrer')})()`;
+}
+
+const localBookmarklet = createBookmarklet('http://localhost:4321/studio');
+const productionBookmarklet = createBookmarklet('https://webdesignfeed.com/studio');
+---
+
+<BaseLayout
+  title="Add to Feed Bookmarklet"
+  description="Install the private Web Design Feed bookmarklet."
+  noindex
+  showSideNav={false}
+>
+  <Breadcrumb items={[{ label: 'Bookmarklet', href: '/bookmarklet' }]} />
+
+  <PageHeading>Add to Feed bookmarklet</PageHeading>
+
+  <div class="max-w-2xl space-y-6 text-on-surface-variant">
+    <p class="leading-relaxed">
+      Drag one of the buttons below to your browser’s bookmarks bar. While reading an article,
+      select the bookmark to open a new Sanity Story draft populated with the page title, URL,
+      description, and source.
+    </p>
+
+    <section
+      class="rounded-xl bg-surface p-stack-md shadow-[inset_0_0_0_1px_rgba(0,0,0,0.15),0_0_0_1px_rgba(255,255,255,0.8)]"
+      aria-labelledby="production-bookmarklet-heading"
+    >
+      <h2 id="production-bookmarklet-heading" class="text-lg font-bold text-primary">
+        Production Studio
+      </h2>
+      <p class="mt-1 text-sm leading-relaxed">
+        Use this bookmark after the template change has been deployed to webdesignfeed.com.
+      </p>
+      <a
+        href={productionBookmarklet}
+        data-bookmarklet-link
+        class="mt-4 inline-flex cursor-grab items-center rounded-lg bg-secondary px-5 py-2.5 font-semibold text-on-secondary transition-opacity hover:opacity-90 active:cursor-grabbing"
+      >
+        Add to Web Design Feed
+      </a>
+    </section>
+
+    <section
+      class="rounded-xl bg-surface p-stack-md shadow-[inset_0_0_0_1px_rgba(0,0,0,0.15),0_0_0_1px_rgba(255,255,255,0.8)]"
+      aria-labelledby="local-bookmarklet-heading"
+    >
+      <h2 id="local-bookmarklet-heading" class="text-lg font-bold text-primary">
+        Local Studio
+      </h2>
+      <p class="mt-1 text-sm leading-relaxed">
+        Use this version while the local Astro server is running at localhost:4321.
+      </p>
+      <a
+        href={localBookmarklet}
+        data-bookmarklet-link
+        class="mt-4 inline-flex cursor-grab items-center rounded-lg border border-outline px-5 py-2.5 font-semibold text-primary transition-colors hover:bg-surface-variant active:cursor-grabbing"
+      >
+        Add to Local Feed
+      </a>
+    </section>
+
+    <div class="rounded-xl border border-outline-variant bg-surface-variant p-4 text-sm leading-relaxed">
+      <strong class="text-primary">Before publishing:</strong>
+      review the imported copy, choose a category, add relevant tags, and upload a thumbnail if needed.
+      The bookmarklet creates a draft only; it never publishes automatically.
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  function initBookmarkletLinks() {
+    document.querySelectorAll<HTMLAnchorElement>('[data-bookmarklet-link]').forEach((link) => {
+      if (link.dataset.bookmarkletInit) return;
+      link.dataset.bookmarkletInit = 'true';
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        window.alert('Drag this button to your browser bookmarks bar instead of clicking it.');
+      });
+    });
+  }
+
+  initBookmarkletLinks();
+  document.addEventListener('astro:page-load', initBookmarkletLinks);
+</script>

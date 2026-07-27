@@ -45,6 +45,7 @@ export default defineConfig({
         !page.includes('/newsletter/success') &&
         !page.includes('/404') &&
         !page.includes('/studio') &&
+        !page.includes('/bookmarklet') &&
         !page.includes('/search') &&
         !page.includes('/bookmarks') &&
         !page.includes('/tag/'),

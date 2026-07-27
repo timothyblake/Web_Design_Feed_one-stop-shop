@@ -2,6 +2,7 @@ User-agent: *
 Allow: /
 Disallow: /search
 Disallow: /studio
+Disallow: /bookmarklet
 Disallow: /*?q=
 Disallow: /*?*
 

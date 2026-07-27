@@ -1,0 +1,77 @@
+<section
+  class="rounded-xl bg-surface p-stack-md shadow-[inset_0_0_0_1px_rgba(0,0,0,0.15),0_0_0_1px_rgba(255,255,255,0.8)]"
+  aria-labelledby="newsletter-form-heading"
+>
+  <h2 id="newsletter-form-heading" class="font-headline-md text-lg font-bold text-primary">
+    Join the monthly update
+  </h2>
+  <p class="mt-1 text-sm leading-relaxed text-on-surface-variant">
+    Add your details below to receive the best of Web Design Feed in your inbox.
+  </p>
+
+  <form
+    action="https://newsletters.webdesignfeed.com/subscribe"
+    method="POST"
+    accept-charset="utf-8"
+    class="mt-5 flex flex-col gap-4"
+  >
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div class="flex flex-col gap-1.5">
+        <label for="newsletter-name" class="text-sm font-semibold text-primary">Name</label>
+        <input
+          type="text"
+          name="name"
+          id="newsletter-name"
+          autocomplete="name"
+          required
+          class="rounded-lg border border-[#dee2e6] bg-transparent px-3 py-2 text-primary transition-all focus:outline-none focus-visible:ring-1 focus-visible:ring-secondary"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="newsletter-email" class="text-sm font-semibold text-primary">Email</label>
+        <input
+          type="email"
+          name="email"
+          id="newsletter-email"
+          autocomplete="email"
+          inputmode="email"
+          required
+          class="rounded-lg border border-[#dee2e6] bg-transparent px-3 py-2 text-primary transition-all focus:outline-none focus-visible:ring-1 focus-visible:ring-secondary"
+        />
+      </div>
+    </div>
+
+    <div class="g-recaptcha max-w-full overflow-hidden" data-sitekey="6LdXBEAsAAAAADtaxOdLorXfNlxBuJHT7lhFENNE"></div>
+
+    <div class="hidden" aria-hidden="true">
+      <label for="newsletter-hp">HP</label>
+      <input
+        type="text"
+        name="hp"
+        id="newsletter-hp"
+        tabindex="-1"
+        autocomplete="off"
+      />
+    </div>
+
+    <input type="hidden" name="list" value="N3iAF5VUAxiEmfMgrJsygA" />
+    <input type="hidden" name="subform" value="yes" />
+
+    <button
+      type="submit"
+      name="submit"
+      id="newsletter-submit"
+      class="self-start rounded-lg bg-secondary px-6 py-2.5 font-semibold text-on-secondary transition-all hover:opacity-90 active:scale-95"
+    >
+      Join Newsletter
+    </button>
+  </form>
+</section>
+
+<script
+  is:inline
+  src="https://www.google.com/recaptcha/api.js"
+  async
+  defer
+></script>

@@ -23,7 +23,7 @@ function isActive(href: string): boolean {
 <header
   class="bg-surface sticky top-0 border-b border-[#dee2e6] z-50"
 >
-  <div class="grid grid-cols-[auto_1fr_auto] md:grid-cols-[1fr_auto_1fr] items-center px-gutter w-full h-16 max-w-container-max mx-auto">
+  <div class="grid grid-cols-[auto_1fr_auto] md:grid-cols-[1fr_auto_1fr] items-center w-full h-16 max-w-container-max mx-auto">
     <div class="contents md:flex md:items-center md:gap-stack-lg md:justify-self-start">
       <button
         id="mobile-menu-btn"
@@ -32,7 +32,7 @@ function isActive(href: string): boolean {
         aria-expanded="false"
         aria-controls="mobile-menu"
       >
-        <Icon name="menu" />
+        <Icon name="menu" id="mobile-menu-icon" />
       </button>
 
       <a href="/" class="flex items-center justify-self-center md:justify-self-auto gap-2" aria-label={SITE_TITLE}>
@@ -179,11 +179,7 @@ function isActive(href: string): boolean {
 
 <script>
   import { BOOKMARKS_CHANGED_EVENT, getBookmarks } from '../../lib/bookmarks-client';
-  import { ICONS, type IconName } from '../../lib/icons';
-
-  function iconSvg(name: IconName, className = 'icon'): string {
-    return `<svg class="${className}" width="24" height="24" viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true" data-icon="${name}"><path d="${ICONS[name].path}"/></svg>`;
-  }
+  import { ICONS } from '../../lib/icons';
 
   // The whole <header> is swapped in fresh on every ClientRouter navigation
   // (it re-renders per page so `aria-current` tracks the new URL), so its
@@ -222,6 +218,7 @@ function isActive(href: string): boolean {
 
   function setMobileOpen(open: boolean, returnFocus = false) {
     const mobileBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenuIcon = document.getElementById('mobile-menu-icon');
     const mobileMenu = document.getElementById('mobile-menu');
     const mobileSearch = document.getElementById('mobile-search') as HTMLInputElement | null;
     if (!mobileBtn || !mobileMenu) return;
@@ -230,7 +227,10 @@ function isActive(href: string): boolean {
     mobileMenu.toggleAttribute('inert', !open);
     mobileBtn.setAttribute('aria-expanded', String(open));
     mobileBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-    mobileBtn.innerHTML = iconSvg(open ? 'close' : 'menu');
+    mobileMenuIcon?.setAttribute('data-icon', open ? 'close' : 'menu');
+    mobileMenuIcon
+      ?.querySelector('path')
+      ?.setAttribute('d', ICONS[open ? 'close' : 'menu'].path);
 
     if (open) {
       requestAnimationFrame(() => mobileSearch?.focus());

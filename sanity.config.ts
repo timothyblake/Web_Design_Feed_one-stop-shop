@@ -3,6 +3,13 @@ import { structureTool } from 'sanity/structure';
 import { visionTool } from '@sanity/vision';
 import { schemaTypes } from './sanity/schemaTypes';
 
+interface StoryBookmarkletParams {
+  title?: string;
+  url?: string;
+  description?: string;
+  source?: string;
+}
+
 // Embedded Studio config, auto-detected by the `@sanity/astro` integration
 // (see astro.config.mjs) and mounted at /studio during `astro dev`/build.
 export default defineConfig({
@@ -21,5 +28,28 @@ export default defineConfig({
   plugins: [structureTool(), visionTool()],
   schema: {
     types: schemaTypes,
+    templates: (prev) => [
+      ...prev,
+      {
+        id: 'story-from-bookmarklet',
+        title: 'Story from bookmarklet',
+        description: 'Create a draft using metadata collected from an article page.',
+        schemaType: 'story',
+        parameters: [
+          { name: 'title', type: 'string' },
+          { name: 'url', type: 'string' },
+          { name: 'description', type: 'string' },
+          { name: 'source', type: 'string' },
+        ],
+        value: (params: StoryBookmarkletParams) => ({
+          title: params.title?.trim().slice(0, 150) ?? '',
+          url: params.url?.trim() ?? '',
+          description: params.description?.trim().slice(0, 280) ?? '',
+          source: params.source?.trim() ?? '',
+          featured: false,
+          publishedAt: new Date().toISOString(),
+        }),
+      },
+    ],
   },
 });
