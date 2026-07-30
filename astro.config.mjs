@@ -54,7 +54,9 @@ export default defineConfig({
       projectId: env.PUBLIC_SANITY_PROJECT_ID || 'your-project-id',
       dataset: env.PUBLIC_SANITY_DATASET || 'production',
       apiVersion: env.PUBLIC_SANITY_API_VERSION || '2024-01-01',
-      useCdn: true,
+      // Static builds must read the latest published documents rather than a
+      // potentially stale edge-cached query response.
+      useCdn: false,
       studioBasePath: '/studio',
     }),
     react(),

@@ -39,7 +39,9 @@ export function sanityStoriesLoader(): Loader {
         projectId,
         dataset,
         apiVersion: import.meta.env.PUBLIC_SANITY_API_VERSION || '2024-01-01',
-        useCdn: true,
+        // Astro materializes this collection at dev/build time, so freshness
+        // matters more than CDN query caching.
+        useCdn: false,
       });
 
       let rawStories: Array<Record<string, unknown>> = [];
@@ -58,7 +60,22 @@ export function sanityStoriesLoader(): Loader {
         const id = String(_id);
         fetchedIds.add(id);
 
-        const digest = generateDigest(story);
+        // Tags become route parameters. Normalize authoring whitespace here so
+        // a value such as "Designers " cannot generate an invalid static path.
+        const tags = Array.from(
+          new Set(
+            (Array.isArray(rest.tags) ? rest.tags : [])
+              .map((tag) => String(tag).trim())
+              .filter(Boolean)
+          )
+        );
+        const normalizedStory = {
+          ...rest,
+          category: normalizeCategorySlug(String(rest.category ?? '').trim()),
+          tags,
+        };
+
+        const digest = generateDigest({ _id, _updatedAt, ...normalizedStory });
         const existing = store.get(id);
         if (existing && existing.digest === digest) {
           loadedCount++;
@@ -68,10 +85,7 @@ export function sanityStoriesLoader(): Loader {
         try {
           const data = await parseData({
             id,
-            data: {
-              ...rest,
-              category: normalizeCategorySlug(String(rest.category ?? '')),
-            },
+            data: normalizedStory,
           });
           store.set({ id, data, digest });
           loadedCount++;
