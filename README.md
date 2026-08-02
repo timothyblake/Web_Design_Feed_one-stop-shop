@@ -557,6 +557,7 @@ The CSP also carries a few third-party allowances tied to specific features — 
 
 - `form-action` includes `https://newsletters.webdesignfeed.com`, where the newsletter form actually submits (see [Newsletter](#newsletter)).
 - `script-src`, `frame-src`, and `connect-src` include `https://www.google.com` (and `https://www.gstatic.com` for scripts) for the reCAPTCHA widget on that same form.
+- `connect-src` includes `https://*.api.sanity.io`, `https://*.apicdn.sanity.io`, and `wss://*.api.sanity.io` for the embedded Studio at `/studio` — without these the Studio's own API and realtime requests are CSP-blocked, which surfaces in the browser as a "Couldn't reach the Sanity servers" network error even when the API itself is reachable and CORS is configured correctly.
 
 If either the newsletter provider/domain or the spam-protection service changes, these need to change with it — see [Changing domains or hosting](#changing-domains-or-hosting).
 
