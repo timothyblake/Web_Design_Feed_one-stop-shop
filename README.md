@@ -1,8 +1,8 @@
 # Web Design Feed
 
-Web Design Feed is a statically generated editorial feed that curates useful UI and UX design, front-end, back-end, resources, and business articles from around the web. Every story card links directly to the original publisher; the site is a discovery and reading-list product, not a republishing platform.
+Web Design Feed is a statically generated editorial feed that curates useful UI and UX design, front-end, web development, resources, and business articles from around the web. Every story card links directly to the original publisher; the site is a discovery and reading-list product, not a republishing platform.
 
-The project is built with Astro, TypeScript, Tailwind CSS, and Sanity. Editors manage stories in the embedded Sanity Studio; Astro fetches and validates the published documents at build time, then generates the main feed, category and tag archives, a featured collection, RSS feeds, structured SEO data, a Pagefind search index, and an AI-readable `llms.txt` endpoint.
+The project is built with Astro, TypeScript, Tailwind CSS, and Sanity. Editors manage stories in the embedded Sanity Studio; Astro fetches and validates the published documents at build time, then generates the main feed, category and tag archives, a featured collection, RSS feeds, structured SEO data, a client-side search page, and an AI-readable `llms.txt` endpoint.
 
 ## Contents
 
@@ -33,14 +33,14 @@ The project is built with Astro, TypeScript, Tailwind CSS, and Sanity. Editors m
 
 - Statically generated, paginated story feed.
 - Sanity-backed story management through the embedded Studio at `/studio`.
-- Five curated categories: UI & UX Design, Front-end, Back-end, Resources, and Business.
+- Six curated categories: UI & UX Design, Design, Front-end, Web Development, Resources, and Business.
 - Dynamically generated category and tag archive pages.
 - Featured-story collection with a branded star indicator.
-- Full-site search powered by Pagefind after the production build.
+- Client-side story search on `/search` — filters already-rendered cards as you type, no build step or index required.
 - Browser-local bookmarks with a live count in the header.
 - Share controls for X, LinkedIn, Facebook, the Web Share API, and copying a link.
 - Dedicated all-stories and featured-only RSS feeds.
-- Buttondown newsletter subscription and archive links.
+- Monthly newsletter subscription via Buttondown, behind a custom `newsletters.webdesignfeed.com` domain with reCAPTCHA spam protection.
 - Responsive desktop sidebar and mobile burger navigation.
 - A consistent light-only visual theme.
 - Canonical URLs, Open Graph metadata, Twitter cards, JSON-LD, a sitemap, robots rules, and `llms.txt`.
@@ -56,7 +56,7 @@ The project is built with Astro, TypeScript, Tailwind CSS, and Sanity. Editors m
 | Content | Sanity Content Lake, loaded through Astro's Content Layer and a validated Zod schema |
 | Administration | Embedded Sanity Studio at `/studio`, with Structure and Vision tools |
 | Styling | Tailwind CSS 4 through the Vite plugin |
-| Search | Pagefind |
+| Search | Custom client-side filter (`src/pages/search.astro`) — no external index |
 | Feeds | `@astrojs/rss` |
 | SEO | Astro Sitemap, canonical metadata, social metadata, and JSON-LD |
 | Fonts | Astro Fonts API using Mona Sans and Geist |
@@ -78,8 +78,10 @@ External services used by the current implementation are:
 - Sanity Content Lake for stories and Sanity Studio for administration.
 - Google Fonts and Material Symbols.
 - Google's favicon service for source-site icons.
-- Buttondown for newsletter subscriptions and the newsletter archive.
-- Pagefind for the generated production search index.
+- Buttondown for newsletter subscriptions, behind the custom domain `newsletters.webdesignfeed.com`.
+- Google reCAPTCHA for spam protection on the newsletter form.
+
+`pagefind` still ships as a devDependency with a `postbuild` script that indexes `dist/` on every build (see [Search](#search)), but nothing on the site queries that index — it's leftover from an earlier implementation and safe to ignore or remove.
 
 ## Getting started
 
@@ -121,7 +123,7 @@ npm run build
 npm run preview
 ```
 
-The production build is important for testing search because the Pagefind index does not exist during a normal development session.
+Search works identically in `npm run dev` and in a production build — it's a client-side filter over already-rendered cards, not a generated index. The production build is still worth previewing before shipping (see [Testing and quality checks](#testing-and-quality-checks)), but not specifically to test search.
 
 ## Commands
 
@@ -130,7 +132,7 @@ The production build is important for testing search because the Pagefind index 
 | `npm install` | Install locked dependencies. |
 | `npm run dev` | Start the normal foreground Astro development server. |
 | `npm run astro -- dev --background` | Start the background development server used by this workspace. |
-| `npm run build` | Generate the static site in `dist/`, then run Pagefind through `postbuild`. |
+| `npm run build` | Generate the static site in `dist/`, then run an unused Pagefind index through `postbuild` (see [Search](#search)). |
 | `npm run preview` | Serve the generated `dist/` output locally. |
 | `npm run check` | Run Astro and TypeScript diagnostics. |
 | `npm run import:stories -- path/to/stories.json` | Import or update stories from a JSON array; requires `SANITY_API_TOKEN`. |
@@ -161,7 +163,7 @@ The production build is important for testing search because the Pagefind index 
 │   │   │   └── SideNav.astro
 │   │   └── ui/
 │   │       ├── Breadcrumb.astro
-│   │       ├── NewsletterCTA.astro
+│   │       ├── NewsletterForm.astro
 │   │       ├── PageHeading.astro
 │   │       ├── SeoBlurb.astro
 │   │       └── StoryCard.astro
@@ -243,13 +245,14 @@ The original article URL is the story's primary link. There are intentionally no
 | --- | --- | --- | --- |
 | `/` | `src/pages/[...page].astro` | Indexed | Latest stories, first page of the paginated feed. |
 | `/2`, `/3`, etc. | `src/pages/[...page].astro` | Indexed | Additional feed pages when enough stories exist. |
-| `/featured` | `src/pages/featured.astro` | Indexed | Stories marked `featured: true`. |
+| `/featured`, `/featured/2`, etc. | `src/pages/featured/[...page].astro` | Indexed | Stories marked `featured: true`, paginated. |
 | `/feeds` | `src/pages/feeds.astro` | Indexed | Landing page for the complete and featured-only RSS feeds. |
-| `/:category-slug` | `src/pages/[slug]/[...page].astro` | Indexed | Statically generated archive for each configured category. |
-| `/tag/:slug` | `src/pages/tag/[slug].astro` | Noindex | Statically generated archive for every tag found in Sanity stories. |
-| `/search` | `src/pages/search.astro` | Noindex | Pagefind search interface in production builds. |
+| `/:category-slug` | `src/pages/[slug]/[...page].astro` | Indexed | Statically generated, paginated archive for each configured category. |
+| `/tag/:slug` | `src/pages/tag/[slug]/[...page].astro` | Noindex | Statically generated, paginated archive for every tag found in Sanity stories (deliberately noindexed to avoid thin/duplicate-content pages — see the comment at the top of that file). |
+| `/search` | `src/pages/search.astro` | Noindex | Client-side search — filters already-rendered story cards, no build step required. |
 | `/bookmarks` | `src/pages/bookmarks.astro` | Noindex | Browser-local saved stories. |
-| `/newsletter` | `src/pages/newsletter.astro` | Indexed | Newsletter explanation, subscription form, and archive link. |
+| `/newsletter` | `src/pages/newsletter.astro` | Indexed | Newsletter explanation and subscription form. |
+| `/bookmarklet` | `src/pages/bookmarklet.astro` | Noindex | Internal tool for creating a Sanity Story draft from the current page's metadata. |
 | `/about` | `src/pages/about.astro` | Indexed | Project purpose and editorial approach. |
 | `/studio` | `@sanity/astro` | Noindex | Embedded Sanity Studio administration interface. |
 | `/studio/callback` | `src/pages/studio/callback.astro` | Noindex | Completes the Sanity Studio authentication flow. |
@@ -304,7 +307,7 @@ The equivalent document shape is:
 5. Add an optional thumbnail and meaningful image alternative text.
 6. Enable **Featured** only if the story belongs in the editor's picks.
 7. Publish the document in Studio.
-8. Run and deploy a new production build so the static site, feeds, sitemap, and Pagefind index include the change.
+8. Run and deploy a new production build so the static site, feeds, and sitemap include the change.
 
 Story ordering is automatic: all feed-like pages sort `publishedAt` from newest to oldest.
 
@@ -347,23 +350,17 @@ A featured story appears:
 - In `/featured.xml`.
 - With a filled star using the site's `secondary` brand color.
 
-The featured RSS feed is intended to support the weekly newsletter workflow. Removing or changing `featured` updates the generated page and feed on the next build.
+The featured RSS feed is intended to support the monthly newsletter workflow. Removing or changing `featured` updates the generated page and feed on the next build.
 
 ## Search
 
-Search uses Pagefind and is generated after Astro finishes building:
-
-```json
-"build": "astro build",
-"postbuild": "pagefind --site dist"
-```
+`src/pages/search.astro` renders every story into the page (each wrapped in an `<li hidden>`), then a small client-side script filters them by substring match across title, description, source, category, and tags as the user types. There's no external index, no build step, and no separate infrastructure — it works identically in `astro dev` and in a production build.
 
 Consequences:
 
-- Search is not fully available in `astro dev` because `/pagefind/pagefind-ui.js` has not been generated.
-- The Search page catches the missing module during development and shows a fallback message.
-- To test real search behavior, run `npm run build` followed by `npm run preview`.
 - Search is excluded from indexing through page metadata and `robots.txt` because query-result pages should not become search-engine landing pages.
+- Because every story ships into the page up front, this approach is best suited to a catalog of a few hundred stories or fewer. If the story count grows substantially, consider a real search index or server-side query instead.
+- `package.json` still has a `postbuild` script that runs `pagefind --site dist` (a leftover from an earlier implementation). It generates a Pagefind index in `dist/`, but nothing on the site queries it — safe to remove along with the `pagefind` devDependency if you don't plan to revisit it.
 
 The desktop header search opens from an icon and animates horizontally. Escape closes it, clicking outside closes it, and focus moves into the input when opened. Mobile search is the first item in the burger menu, followed by category navigation.
 
@@ -384,13 +381,21 @@ Bookmark data never leaves the browser. Clearing site data, switching browsers, 
 
 ### Newsletter
 
-`NewsletterCTA.astro` posts email addresses directly to Buttondown:
+`NewsletterForm.astro` (rendered on `/newsletter`) submits a standard full-page POST — not a popup, no client-side interception — to:
 
 ```text
-https://buttondown.email/api/emails/embed-subscribe/webdesignfeed
+https://newsletters.webdesignfeed.com/subscribe
 ```
 
-If the Buttondown publication name changes, update the form `action`. The Newsletter page also links to the Buttondown archive. The site's Content Security Policy explicitly permits forms to submit to `https://buttondown.email`.
+That's Buttondown behind our own custom domain, not `buttondown.email` directly. The form also embeds a Google reCAPTCHA widget (`recaptcha/api.js`, hardcoded sitekey in the component) and a hidden honeypot field (`name="hp"`, `tabindex="-1"`, `aria-hidden`) for basic spam mitigation.
+
+If the newsletter provider or domain changes, update the form `action` in `NewsletterForm.astro` **and** the CSP in `public/_headers`:
+
+- `form-action` must include the exact origin the form posts to.
+- `script-src` must allow `https://www.google.com` and `https://www.gstatic.com` for reCAPTCHA to load.
+- `frame-src` must allow `https://www.google.com` for reCAPTCHA's challenge iframe.
+
+A mismatch here fails silently in the browser (the CSP just blocks the request) — see [Newsletter submissions fail](#newsletter-submissions-fail) in Troubleshooting.
 
 ### RSS feeds
 
@@ -493,8 +498,7 @@ When adding a new interaction, preserve keyboard operation and update ARIA state
 2. Static routes, XML feeds, text endpoints, assets, and metadata are generated in `dist/`.
 3. The sitemap integration emits sitemap files.
 4. The compression integration optimizes final output.
-5. npm automatically runs `postbuild`.
-6. Pagefind indexes `dist/` and writes its search assets into the build.
+5. npm automatically runs `postbuild`, which indexes `dist/` with Pagefind — output that nothing on the site currently queries (see [Search](#search)).
 
 The Astro configuration also enables viewport-based prefetching, constrained image layout, automatic stylesheet inlining, MDX support for any future non-story pages, and no-trailing-slash page URLs.
 
@@ -523,16 +527,16 @@ npm run build
 npx wrangler deploy
 ```
 
-Confirm the exact deployment command used by the hosting account before running it in automation. The repository currently contains no CI workflow, so deployment orchestration is external to this project.
+Confirm the exact deployment command used by the hosting account before running it in automation. `.github/workflows/ci.yml` runs `npm run check` and `npm run build` on every push and pull request to `main`, but it does not deploy — deployment is still a manual `wrangler deploy` (or whatever the hosting account actually runs), external to this project. The CI job sets `PUBLIC_SANITY_*` directly as job-level env vars since those are `PUBLIC_`-prefixed values already shipped to the client bundle, not secrets.
 
 After deployment, verify:
 
 - The homepage and one generated category page return `200`.
 - An unknown URL returns a real `404` status rather than a soft 404.
 - `/rss.xml`, `/featured.xml`, `/llms.txt`, and the sitemap load successfully.
-- Search returns results from the deployed Pagefind index.
+- Typing in `/search` filters results.
 - Security headers are present.
-- The newsletter form opens the expected Buttondown flow.
+- Submitting the newsletter form on `/newsletter` actually completes (open the browser console and check for CSP violation errors first if it doesn't).
 
 ## Security and caching
 
@@ -548,6 +552,13 @@ Security headers include:
 - A Content Security Policy limiting scripts, styles, fonts, images, connections, framing, and form submission.
 
 The current CSP permits inline scripts for the generated JSON-LD structured-data blocks. If Astro's automatic CSP hashing becomes suitable for the project, this allowance can be tightened.
+
+The CSP also carries a few third-party allowances tied to specific features — narrow, not blanket:
+
+- `form-action` includes `https://newsletters.webdesignfeed.com`, where the newsletter form actually submits (see [Newsletter](#newsletter)).
+- `script-src`, `frame-src`, and `connect-src` include `https://www.google.com` (and `https://www.gstatic.com` for scripts) for the reCAPTCHA widget on that same form.
+
+If either the newsletter provider/domain or the spam-protection service changes, these need to change with it — see [Changing domains or hosting](#changing-domains-or-hosting).
 
 Caching rules:
 
@@ -577,21 +588,17 @@ Recommended manual checks:
 7. Confirm only featured stories show the brand-colored star.
 8. Navigate entirely by keyboard and inspect focus visibility.
 9. Test reduced motion through the operating system or browser emulation.
-10. Preview the production build and perform a real Pagefind search.
+10. Type a query into `/search` and confirm results filter correctly (works in `astro dev`, no build required).
 11. Validate the RSS feeds and inspect canonical/social metadata.
+12. Submit the newsletter form end-to-end against a deployed build, including the reCAPTCHA challenge.
 
 At the time this README was updated, `astro check` reports no errors, warnings, or hints.
 
 ## Troubleshooting
 
-### Search says it is only available on the deployed site
+### Search returns no results even though stories exist
 
-This is expected during `astro dev`. Build and preview the production output:
-
-```bash
-npm run build
-npm run preview
-```
+Check the browser console for a JS error in the search script rather than assuming the index is stale — there is no index. Search filters `<li data-search-item>` elements already present in the page's HTML, so if a story is missing from search, confirm it actually appears in the underlying story collection (same causes as [Sanity stories do not appear](#sanity-stories-do-not-appear)).
 
 ### Sanity stories do not appear
 
@@ -631,7 +638,13 @@ Both pages must use the same origin and storage partition. The project listens f
 
 ### Newsletter submissions fail
 
-Verify the Buttondown form action, publication name, deployed CSP `form-action`, and the external service status.
+This has historically been a CSP mismatch, not a form or Buttondown problem — check the browser console for `Content-Security-Policy` violation errors first. Confirm `public/_headers` allows all of:
+
+- `form-action` includes the exact origin `NewsletterForm.astro`'s `action` attribute points to (currently `https://newsletters.webdesignfeed.com`).
+- `script-src` includes `https://www.google.com` and `https://www.gstatic.com`, or the reCAPTCHA script itself won't load.
+- `frame-src` includes `https://www.google.com`, or the reCAPTCHA challenge iframe won't render.
+
+Only after ruling out CSP: verify the Buttondown publication is still active and the external service isn't down.
 
 ### Fonts or icons do not load
 
@@ -664,12 +677,11 @@ Check network access to Google Fonts and confirm the deployed CSP still permits 
 - Review canonical URLs and the sitemap.
 - Confirm `_headers` syntax is supported by the new host.
 - Confirm 404 status behavior.
-- Re-test Pagefind asset paths.
-- Re-test newsletter CSP permissions.
+- Re-test the newsletter form and reCAPTCHA against the deployed CSP (see [Newsletter submissions fail](#newsletter-submissions-fail)).
 
 ### Updating dependencies
 
-1. Review Astro, Tailwind, Pagefind, and integration release notes.
+1. Review Astro, Tailwind, and Sanity integration release notes.
 2. Update packages with npm so `package-lock.json` stays synchronized.
 3. Run `npm run check`.
 4. Run a clean production build.

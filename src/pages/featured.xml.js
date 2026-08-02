@@ -9,9 +9,9 @@ export async function GET(context) {
 
   return rss({
     title: `${SITE_TITLE} — Featured`,
-    // Buttondown's RSS-to-email reads this feed to draft the weekly digest,
+    // Buttondown's RSS-to-email reads this feed to draft the monthly digest,
     // so the description doubles as the newsletter's framing copy.
-    description: "Editor's picks — the best stories of the week, ready for the Friday digest.",
+    description: "Editor's picks — the best stories of the month, ready for the monthly digest.",
     site: context.site,
     items: stories.map((story) => ({
       title: story.data.title,

@@ -1,6 +1,6 @@
 export const SITE_TITLE = 'Web Design Feed';
 export const SITE_DESCRIPTION =
-  'A curated feed of the best UI and UX design, front-end and back-end development stories from around the web.';
+  'A curated feed of the best UI and UX design, front-end and web development stories from around the web.';
 export const SITE_URL = 'https://webdesignfeed.com';
 export const SITE_LOGO = '/web-design-feed-logo.svg';
 export const DEFAULT_LANG = 'en-GB';

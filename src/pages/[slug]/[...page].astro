@@ -43,7 +43,10 @@ const baseLabel = categoryPageTitle(categorySlug);
 const label = page.currentPage === 1 ? baseLabel : `${baseLabel} — Page ${page.currentPage}`;
 const blurb = CATEGORY_BLURBS[categorySlug];
 const shortDescription = CATEGORY_DESCRIPTIONS[categorySlug];
-const description = `The latest ${baseLabel} stories — curated links to the best articles across the web.`;
+const description =
+  page.currentPage === 1
+    ? shortDescription
+    : `${shortDescription} (Page ${page.currentPage})`;
 
 const jsonLd =
   page.currentPage === 1
@@ -89,7 +92,7 @@ const jsonLd =
   )}
 
   {page.lastPage > 1 && (
-    <nav aria-label="Pagination" class="mt-8 flex items-center justify-center gap-3 border-t border-outline pt-8 pb-4">
+    <nav aria-label="Pagination" class="mt-8 flex items-center justify-center gap-3 shadow-[inset_0_1px_0_rgba(0,0,0,0.15),0_-1px_0_rgba(255,255,255,0.8)] pt-8 pb-4">
       {page.url.prev ? (
         <a
           href={page.url.prev}

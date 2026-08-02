@@ -67,7 +67,7 @@ const jsonLd =
   )}
 
   {page.lastPage > 1 && (
-    <nav aria-label="Pagination" class="mt-8 flex items-center justify-center gap-3 border-t border-outline pt-8 pb-4">
+    <nav aria-label="Pagination" class="mt-8 flex items-center justify-center gap-3 shadow-[inset_0_1px_0_rgba(0,0,0,0.15),0_-1px_0_rgba(255,255,255,0.8)] pt-8 pb-4">
       {page.url.prev ? (
         <a
           href={page.url.prev}
@@ -99,14 +99,14 @@ const jsonLd =
   {page.currentPage === 1 && (
     <SeoBlurb title={`About ${SITE_TITLE}`}>
       <p>
-        {SITE_TITLE} is a curated feed of the best UI and UX design, front-end and back-end development
+        {SITE_TITLE} is a curated feed of the best UI and UX design, front-end and web development
         stories from around the web. Every entry links straight to the original article — this is a reading
         list, not a republishing platform.
       </p>
       <p>
         Stories are hand-picked from a rotating list of industry sources, added the moment they're worth
         sharing. The best ones get flagged <a href="/featured" class="underline hover:text-primary">Featured</a>
-        and rolled into the <a href="/newsletter" class="underline hover:text-primary">weekly newsletter</a>.
+        and rolled into the <a href="/newsletter" class="underline hover:text-primary">monthly newsletter</a>.
       </p>
       <p>
         Browse by <a href={`/${categoryUrlSlug('ui-ux-design')}`} class="underline hover:text-primary">category</a> or

@@ -50,7 +50,7 @@ const title = page.currentPage === 1
   )}
 
   {page.lastPage > 1 && (
-    <nav aria-label="Pagination" class="mt-8 flex items-center justify-center gap-3 border-t border-outline pt-8 pb-4">
+    <nav aria-label="Pagination" class="mt-8 flex items-center justify-center gap-3 shadow-[inset_0_1px_0_rgba(0,0,0,0.15),0_-1px_0_rgba(255,255,255,0.8)] pt-8 pb-4">
       {page.url.prev ? (
         <a
           href={page.url.prev}
@@ -82,7 +82,7 @@ const title = page.currentPage === 1
   {page.currentPage === 1 && (
     <SeoBlurb title="About Editor's Choice on Web Design Feed">
       <p>
-        Editor's Choice brings together standout stories from UI and UX design, front-end and back-end
+        Editor's Choice brings together standout stories from UI and UX design, front-end and web
         development, creative resources, and the business of building for the web.
       </p>
       <p>
