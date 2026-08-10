@@ -317,7 +317,7 @@ The bookmarklet captures the article's `og:image` (falling back to `twitter:imag
 
 Setup, one time, in Cloudflare:
 
-1. **R2 Object Storage → Create bucket**, named to match `bucket_name` in `wrangler.jsonc` (`web-design-feed-thumbnails`), or update `wrangler.jsonc` to match whatever name you choose.
+1. **R2 Object Storage → Create bucket**, named to match `bucket_name` in `wrangler.jsonc` (`webdesignfeed`), or update `wrangler.jsonc` to match whatever name you choose.
 2. Bucket → **Settings → Public access**: connect a custom domain (e.g. `images.webdesignfeed.com`) — the `*.r2.dev` dev URL works for quick testing but isn't meant for production traffic.
 3. Update `THUMBNAILS_PUBLIC_BASE_URL` in `wrangler.jsonc`'s `vars` block to match that domain.
 
@@ -532,7 +532,7 @@ The Astro configuration also enables viewport-based prefetching, constrained ima
     "run_worker_first": ["/api/*"]
   },
   "r2_buckets": [
-    { "binding": "THUMBNAILS", "bucket_name": "web-design-feed-thumbnails" }
+    { "binding": "THUMBNAILS", "bucket_name": "webdesignfeed" }
   ],
   "vars": {
     "THUMBNAILS_PUBLIC_BASE_URL": "https://images.webdesignfeed.com"

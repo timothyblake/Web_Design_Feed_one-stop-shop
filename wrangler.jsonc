@@ -11,7 +11,7 @@
   "r2_buckets": [
     {
       "binding": "THUMBNAILS",
-      "bucket_name": "web-design-feed-thumbnails"
+      "bucket_name": "webdesignfeed"
     }
   ],
   "vars": {
