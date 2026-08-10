@@ -110,7 +110,7 @@ async function uploadThumbnail(request: Request, env: Env): Promise<Response> {
   }
 
   const extension = contentType === 'image/jpeg' ? 'jpg' : contentType.split('/')[1];
-  const key = `${crypto.randomUUID()}.${extension}`;
+  const key = `thumbnails/${crypto.randomUUID()}.${extension}`;
 
   try {
     await env.THUMBNAILS.put(key, bytes, { httpMetadata: { contentType } });
