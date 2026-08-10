@@ -12,16 +12,14 @@ export const FetchThumbnailAction: DocumentActionComponent = (props) => {
   const { patch } = useDocumentOperation(props.id, props.type);
   const document = props.draft ?? props.published;
   const sourceImageUrl = document?.sourceImageUrl;
+  const hasSourceImageUrl = typeof sourceImageUrl === 'string' && sourceImageUrl.trim().length > 0;
 
   return {
     label: isUploading ? 'Fetching thumbnail…' : 'Fetch thumbnail',
-    disabled: isUploading || typeof sourceImageUrl !== 'string',
-    title:
-      typeof sourceImageUrl === 'string'
-        ? 'Copy the source image into R2 storage'
-        : 'Add a source image URL first',
+    disabled: isUploading || !hasSourceImageUrl,
+    title: hasSourceImageUrl ? 'Copy the source image into R2 storage' : 'Add a source image URL first',
     onHandle: async () => {
-      if (typeof sourceImageUrl !== 'string') return;
+      if (!hasSourceImageUrl) return;
 
       setIsUploading(true);
       try {

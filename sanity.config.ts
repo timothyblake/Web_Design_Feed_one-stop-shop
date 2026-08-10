@@ -53,7 +53,7 @@ export default defineConfig({
           url: params.url?.trim() ?? '',
           description: params.description?.trim().slice(0, 280) ?? '',
           source: params.source?.trim() ?? '',
-          sourceImageUrl: params.sourceImageUrl?.trim() ?? '',
+          sourceImageUrl: params.sourceImageUrl?.trim() || undefined,
           featured: false,
           publishedAt: new Date().toISOString(),
         }),
