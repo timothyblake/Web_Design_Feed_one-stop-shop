@@ -304,12 +304,28 @@ The equivalent document shape is:
 2. Create a **Story** document.
 3. Add the title, original article URL, description, source, category, tags, and publication date.
 4. Keep the description within 280 characters and use exactly one supported category.
-5. Add an optional thumbnail and meaningful image alternative text.
+5. Add or confirm the **Source Image URL**, choose **Fetch thumbnail** from the document actions menu, and add meaningful image alternative text.
 6. Enable **Featured** only if the story belongs in the editor's picks.
 7. Publish the document in Studio.
 8. Run and deploy a new production build so the static site, feeds, and sitemap include the change.
 
 Story ordering is automatic: all feed-like pages sort `publishedAt` from newest to oldest.
+
+### R2 thumbnails
+
+The bookmarklet captures the article's `og:image` (falling back to `twitter:image`) into `sourceImageUrl`. The Studio's **Fetch thumbnail** action sends that URL to the same-origin `/api/fetch-thumbnail` Worker route. The Worker downloads the image and stores it in the `THUMBNAILS` R2 bucket, then writes the public delivery URL to `thumbnailUrl`. Existing Sanity image assets remain readable as a legacy fallback.
+
+Setup, one time, in Cloudflare:
+
+1. **R2 Object Storage → Create bucket**, named to match `bucket_name` in `wrangler.jsonc` (`web-design-feed-thumbnails`), or update `wrangler.jsonc` to match whatever name you choose.
+2. Bucket → **Settings → Public access**: connect a custom domain (e.g. `images.webdesignfeed.com`) — the `*.r2.dev` dev URL works for quick testing but isn't meant for production traffic.
+3. Update `THUMBNAILS_PUBLIC_BASE_URL` in `wrangler.jsonc`'s `vars` block to match that domain.
+
+No API tokens or Worker secrets are needed — the Worker reads/writes the bucket through the `r2_buckets` binding declared in `wrangler.jsonc`, which Cloudflare authenticates automatically at deploy time.
+
+For local testing, build the site and run `npx wrangler dev`; wrangler simulates the R2 bucket locally by default (no production data touched) unless you pass `--remote`. Normal `astro dev` serves the static Astro app but does not execute the Worker API route.
+
+Protect both `webdesignfeed.com/studio/*` and `webdesignfeed.com/api/fetch-thumbnail` in the same Cloudflare Access self-hosted application restricted to editors. This gives Studio requests an Access session before the action calls the API. The Worker also rejects cross-origin requests, private-network image URLs, oversized/unsupported source images, and non-POST methods, but the origin check is not a substitute for authentication.
 
 For bulk operations, `npm run import:stories -- path/to/stories.json` accepts an array shaped like the example above. It requires a non-public `SANITY_API_TOKEN` with write permission. The Markdown files in `src/content/stories` are retained only as input for the one-time `migrate:sanity` script and are not the live content source.
 
@@ -504,13 +520,22 @@ The Astro configuration also enables viewport-based prefetching, constrained ima
 
 ### Cloudflare
 
-`wrangler.jsonc` configures a static Cloudflare asset deployment:
+`wrangler.jsonc` configures the static Cloudflare assets plus the thumbnail API Worker:
 
 ```json
 {
   "name": "web-design-feed",
+  "main": "./worker/index.ts",
   "assets": {
-    "directory": "./dist"
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  },
+  "r2_buckets": [
+    { "binding": "THUMBNAILS", "bucket_name": "web-design-feed-thumbnails" }
+  ],
+  "vars": {
+    "THUMBNAILS_PUBLIC_BASE_URL": "https://images.webdesignfeed.com"
   },
   "observability": {
     "enabled": true

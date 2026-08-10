@@ -4,7 +4,7 @@ import Breadcrumb from '../components/ui/Breadcrumb.astro';
 import PageHeading from '../components/ui/PageHeading.astro';
 
 function createBookmarklet(studioBaseUrl: string): string {
-  return `javascript:(()=>{const studio=${JSON.stringify(studioBaseUrl)};const pick=(...selectors)=>{for(const selector of selectors){const value=document.querySelector(selector)?.getAttribute('content')?.trim();if(value)return value}return''};const clean=(value,max)=>value.replace(/\\s+/g,' ').trim().slice(0,max);const payload={title:clean(pick('meta[property="og:title"]','meta[name="twitter:title"]','meta[name="title"]')||document.title,150),url:location.href,description:clean(pick('meta[property="og:description"]','meta[name="twitter:description"]','meta[name="description"]'),280),source:clean(pick('meta[property="og:site_name"]')||location.hostname.replace(/^www\\./,''),100)};const bytes=encodeURIComponent(JSON.stringify(payload)).replace(/%([0-9A-F]{2})/g,(_,hex)=>String.fromCharCode(parseInt(hex,16)));const encoded=btoa(bytes).replace(/\\//g,'_').replace(/\\+/g,'-').replace(/=+$/,'');window.open(studio+'#/intent/create/type=story;template=story-from-bookmarklet/'+encoded,'_blank','noopener,noreferrer')})()`;
+  return `javascript:(()=>{const studio=${JSON.stringify(studioBaseUrl)};const pick=(...selectors)=>{for(const selector of selectors){const value=document.querySelector(selector)?.getAttribute('content')?.trim();if(value)return value}return''};const clean=(value,max)=>value.replace(/\\s+/g,' ').trim().slice(0,max);const absolute=(value)=>{try{return value?new URL(value,location.href).href:''}catch{return''}};const image=pick('meta[property="og:image:secure_url"]','meta[property="og:image"]','meta[name="twitter:image"]');const payload={title:clean(pick('meta[property="og:title"]','meta[name="twitter:title"]','meta[name="title"]')||document.title,150),url:location.href,description:clean(pick('meta[property="og:description"]','meta[name="twitter:description"]','meta[name="description"]'),280),source:clean(pick('meta[property="og:site_name"]')||location.hostname.replace(/^www\\./,''),100),sourceImageUrl:absolute(image)};const bytes=encodeURIComponent(JSON.stringify(payload)).replace(/%([0-9A-F]{2})/g,(_,hex)=>String.fromCharCode(parseInt(hex,16)));const encoded=btoa(bytes).replace(/\\//g,'_').replace(/\\+/g,'-').replace(/=+$/,'');window.open(studio+'#/intent/create/type=story;template=story-from-bookmarklet/'+encoded,'_blank','noopener,noreferrer')})()`;
 }
 
 const localBookmarklet = createBookmarklet('http://localhost:4321/studio');
@@ -25,7 +25,7 @@ const productionBookmarklet = createBookmarklet('https://webdesignfeed.com/studi
     <p class="leading-relaxed">
       Drag one of the buttons below to your browser’s bookmarks bar. While reading an article,
       select the bookmark to open a new Sanity Story draft populated with the page title, URL,
-      description, and source.
+      description, source, and Open Graph image URL.
     </p>
 
     <section
@@ -68,7 +68,8 @@ const productionBookmarklet = createBookmarklet('https://webdesignfeed.com/studi
 
     <div class="rounded-xl border border-outline-variant bg-surface-variant p-4 text-sm leading-relaxed">
       <strong class="text-primary">Before publishing:</strong>
-      review the imported copy, choose a category, add relevant tags, and upload a thumbnail if needed.
+      review the imported copy, choose a category, add relevant tags, then choose <em>Fetch thumbnail</em>
+      from the document actions menu before publishing.
       The bookmarklet creates a draft only; it never publishes automatically.
     </div>
   </div>

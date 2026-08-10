@@ -38,6 +38,7 @@
     "dotenv": "^17.4.2",
     "gray-matter": "^4.0.3",
     "pagefind": "^1.5.2",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "wrangler": "^4.120.1"
   }
 }

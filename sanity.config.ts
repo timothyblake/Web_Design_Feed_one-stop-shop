@@ -2,12 +2,14 @@ import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
 import { visionTool } from '@sanity/vision';
 import { schemaTypes } from './sanity/schemaTypes';
+import { FetchThumbnailAction } from './sanity/actions/FetchThumbnailAction';
 
 interface StoryBookmarkletParams {
   title?: string;
   url?: string;
   description?: string;
   source?: string;
+  sourceImageUrl?: string;
 }
 
 // Embedded Studio config, auto-detected by the `@sanity/astro` integration
@@ -26,6 +28,10 @@ export default defineConfig({
   // has no route for and the sign-in flow just hangs there.
   basePath: '/studio',
   plugins: [structureTool(), visionTool()],
+  document: {
+    actions: (previousActions, context) =>
+      context.schemaType === 'story' ? [FetchThumbnailAction, ...previousActions] : previousActions,
+  },
   schema: {
     types: schemaTypes,
     templates: (prev) => [
@@ -40,12 +46,14 @@ export default defineConfig({
           { name: 'url', type: 'string' },
           { name: 'description', type: 'string' },
           { name: 'source', type: 'string' },
+          { name: 'sourceImageUrl', type: 'string' },
         ],
         value: (params: StoryBookmarkletParams) => ({
           title: params.title?.trim().slice(0, 150) ?? '',
           url: params.url?.trim() ?? '',
           description: params.description?.trim().slice(0, 280) ?? '',
           source: params.source?.trim() ?? '',
+          sourceImageUrl: params.sourceImageUrl?.trim() ?? '',
           featured: false,
           publishedAt: new Date().toISOString(),
         }),
