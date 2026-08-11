@@ -1,18 +1,17 @@
-interface Env {
-  ASSETS: {
-    fetch(request: Request): Promise<Response>;
-  };
-  THUMBNAILS: {
-    put(
-      key: string,
-      value: ArrayBuffer,
-      options?: { httpMetadata?: { contentType?: string } }
-    ): Promise<unknown>;
-  };
-  THUMBNAILS_PUBLIC_BASE_URL?: string;
+import { isValidSignature, SIGNATURE_HEADER_NAME } from '@sanity/webhook';
+
+// Non-secret bindings are generated from wrangler.jsonc in
+// worker-configuration.d.ts. Secret bindings are declared here because their
+// names intentionally never appear in wrangler.jsonc.
+export interface SanityWebhookEnv {
+  SANITY_WEBHOOK_SECRET?: string;
+  CLOUDFLARE_DEPLOY_HOOK_URL?: string;
 }
 
+type WorkerEnv = Cloudflare.Env & SanityWebhookEnv;
+
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+const MAX_WEBHOOK_BYTES = 16 * 1024;
 const ALLOWED_CONTENT_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif']);
 
 const json = (body: unknown, status = 200, extraHeaders: HeadersInit = {}) =>
@@ -48,7 +47,133 @@ function isAllowedSourceUrl(value: unknown): value is string {
   }
 }
 
-async function uploadThumbnail(request: Request, env: Env): Promise<Response> {
+function isCloudflareDeployHookUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return (
+      url.protocol === 'https:' &&
+      url.hostname === 'api.cloudflare.com' &&
+      !url.username &&
+      !url.password &&
+      /^\/client\/v4\/workers\/builds\/deploy_hooks\/[^/]+$/.test(url.pathname)
+    );
+  } catch {
+    return false;
+  }
+}
+
+async function readTextBodyWithLimit(request: Request, limit: number): Promise<string | null> {
+  if (!request.body) return '';
+
+  const reader = request.body.getReader();
+  const decoder = new TextDecoder();
+  let totalBytes = 0;
+  let body = '';
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      totalBytes += value.byteLength;
+      if (totalBytes > limit) {
+        await reader.cancel();
+        return null;
+      }
+      body += decoder.decode(value, { stream: true });
+    }
+
+    return body + decoder.decode();
+  } finally {
+    reader.releaseLock();
+  }
+}
+
+interface SanityWebhookPayload {
+  _id?: unknown;
+  _type?: unknown;
+}
+
+export async function triggerSanityBuild(
+  request: Request,
+  env: SanityWebhookEnv,
+  outboundFetch: typeof fetch = fetch
+): Promise<Response> {
+  if (request.method !== 'POST') {
+    return json({ error: 'Method not allowed' }, 405, { Allow: 'POST' });
+  }
+
+  if (!env.SANITY_WEBHOOK_SECRET || !env.CLOUDFLARE_DEPLOY_HOOK_URL) {
+    return json({ error: 'Webhook secrets are not configured' }, 503);
+  }
+  if (!isCloudflareDeployHookUrl(env.CLOUDFLARE_DEPLOY_HOOK_URL)) {
+    return json({ error: 'Build hook is not configured correctly' }, 503);
+  }
+
+  const contentType = request.headers.get('Content-Type')?.toLowerCase() ?? '';
+  if (!contentType.startsWith('application/json')) {
+    return json({ error: 'Content-Type must be application/json' }, 415);
+  }
+
+  const declaredLength = Number(request.headers.get('Content-Length') ?? '0');
+  if (Number.isFinite(declaredLength) && declaredLength > MAX_WEBHOOK_BYTES) {
+    return json({ error: 'Request body is too large' }, 413);
+  }
+
+  const rawBody = await readTextBodyWithLimit(request, MAX_WEBHOOK_BYTES);
+  if (rawBody === null) {
+    return json({ error: 'Request body is too large' }, 413);
+  }
+
+  const signature = request.headers.get(SIGNATURE_HEADER_NAME) ?? '';
+  const signatureIsValid = await isValidSignature(rawBody, signature, env.SANITY_WEBHOOK_SECRET);
+  if (!signatureIsValid) {
+    return json({ error: 'Invalid webhook signature' }, 401);
+  }
+
+  let payload: SanityWebhookPayload;
+  try {
+    payload = JSON.parse(rawBody) as SanityWebhookPayload;
+  } catch {
+    return json({ error: 'Request body must be valid JSON' }, 400);
+  }
+
+  // The Sanity webhook is also filtered to story documents. Keep this
+  // server-side check as defence in depth if that dashboard filter changes.
+  if (payload._type !== 'story' || typeof payload._id !== 'string') {
+    return json({ success: true, ignored: true }, 202);
+  }
+
+  let buildResponse: Response;
+  try {
+    buildResponse = await outboundFetch(env.CLOUDFLARE_DEPLOY_HOOK_URL, { method: 'POST' });
+  } catch {
+    console.error(JSON.stringify({ event: 'sanity_build_trigger_failed', reason: 'network_error' }));
+    return json({ error: 'Could not reach the build service' }, 502);
+  }
+
+  if (!buildResponse.ok) {
+    console.error(
+      JSON.stringify({
+        event: 'sanity_build_trigger_failed',
+        reason: 'upstream_error',
+        status: buildResponse.status,
+      })
+    );
+    return json({ error: 'Build service rejected the request' }, 502);
+  }
+
+  console.info(
+    JSON.stringify({
+      event: 'sanity_build_triggered',
+      documentId: payload._id,
+      operation: request.headers.get('sanity-operation') ?? 'unknown',
+    })
+  );
+  return json({ success: true, buildTriggered: true }, 202);
+}
+
+async function uploadThumbnail(request: Request, env: WorkerEnv): Promise<Response> {
   if (request.method !== 'POST') {
     return json({ error: 'Method not allowed' }, 405, { Allow: 'POST' });
   }
@@ -123,8 +248,12 @@ async function uploadThumbnail(request: Request, env: Env): Promise<Response> {
 }
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: WorkerEnv): Promise<Response> {
     const url = new URL(request.url);
+
+    if (url.pathname === '/api/sanity-webhook') {
+      return triggerSanityBuild(request, env);
+    }
 
     if (url.pathname === '/api/fetch-thumbnail') {
       return uploadThumbnail(request, env);
@@ -132,4 +261,4 @@ export default {
 
     return env.ASSETS.fetch(request);
   },
-};
+} satisfies ExportedHandler<WorkerEnv>;

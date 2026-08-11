@@ -41,6 +41,26 @@ import Icon from './Icon.astro';
     [data-story-list].is-grid-view {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+
+    [data-story-list]:not(.is-grid-view) .story-card {
+      flex-direction: row;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    [data-story-list]:not(.is-grid-view) .story-thumbnail {
+      flex: 0 0 300px;
+      width: 300px;
+      height: 180px;
+      margin: 0;
+      border-radius: 0.75rem;
+      align-self: center;
+    }
+
+    [data-story-list]:not(.is-grid-view) .story-thumbnail img {
+      width: 100%;
+      height: 100%;
+    }
   }
 
   /* Grid items stretch to the row height by default, but that height has to
@@ -52,6 +72,10 @@ import Icon from './Icon.astro';
   [data-story-list].is-grid-view > li > article {
     flex: 1;
     width: 100%;
+  }
+
+  [data-story-list].is-grid-view .story-thumbnail img {
+    aspect-ratio: 43 / 20;
   }
 
   [data-story-list].is-grid-view .story-category-pill {
@@ -72,6 +96,14 @@ import Icon from './Icon.astro';
   function applyView(mode: ViewMode) {
     document.querySelectorAll<HTMLElement>('[data-story-list]').forEach((list) => {
       list.classList.toggle('is-grid-view', mode === 'grid');
+    });
+    document.querySelectorAll<HTMLImageElement>('.story-thumbnail img').forEach((image) => {
+      const nextSrc = mode === 'grid' ? image.dataset.gridSrc : image.dataset.listSrc;
+      if (nextSrc && image.getAttribute('src') !== nextSrc) {
+        image.setAttribute('src', nextSrc);
+      }
+      image.setAttribute('width', mode === 'grid' ? '430' : '300');
+      image.setAttribute('height', mode === 'grid' ? '200' : '180');
     });
     document.querySelectorAll<HTMLButtonElement>('[data-view-btn]').forEach((btn) => {
       const active = btn.dataset.viewBtn === mode;

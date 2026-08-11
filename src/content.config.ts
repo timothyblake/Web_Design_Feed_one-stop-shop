@@ -7,8 +7,8 @@ const categorySlugs = CATEGORIES.map((c) => c.slug) as [CategorySlug, ...Categor
 
 // Content Layer API (Astro 5+): loader-based collection. Stories live in
 // Sanity now — the loader fetches them via GROQ at build/dev time. `image`
-// is a plain Sanity CDN URL (not an astro:assets `image()` reference, which
-// only resolves local files), rendered as a remote <img> in StoryCard.
+// is the first available R2 thumbnail, captured source image, or legacy
+// Sanity asset URL, rendered through Cloudflare's image transform path.
 const stories = defineCollection({
   loader: sanityStoriesLoader(),
   schema: z.object({

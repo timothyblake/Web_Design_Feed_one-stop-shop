@@ -1,37 +1,56 @@
 ---
-import type { CollectionEntry } from 'astro:content';
-import { categoryLabel, categoryPillClass, categoryUrlSlug, TWITTER_HANDLE } from '../../consts';
-import { relativeTime, formatDate } from '../../utils/formatDate';
-import Icon from './Icon.astro';
+import type { CollectionEntry } from "astro:content";
+import {
+  categoryLabel,
+  categoryPillClass,
+  categoryUrlSlug,
+  TWITTER_HANDLE,
+} from "../../consts";
+import { relativeTime, formatDate } from "../../utils/formatDate";
+import Icon from "./Icon.astro";
 
 interface Props {
-  story: CollectionEntry<'stories'>;
+  story: CollectionEntry<"stories">;
   /** First 2-3 above-the-fold cards: eager-load their image and skip the entrance delay. */
   priority?: boolean;
 }
 
 const { story, priority = false } = Astro.props;
-const { title, url, description, source, category, tags, featured, publishedAt, image, imageAlt } = story.data;
+const {
+  title,
+  url,
+  description,
+  source,
+  category,
+  tags,
+  featured,
+  publishedAt,
+  image,
+  imageAlt,
+} = story.data;
 
-const isSanityImage = image ? new URL(image).hostname === 'cdn.sanity.io' : false;
-const imageSrc = image
-  ? isSanityImage
-    ? `${image}?w=800&h=420&fit=crop&auto=format`
-    : image
+const gridImageSrc = image
+  ? new URL(
+      `/cdn-cgi/image/width=430,height=200,fit=cover/${image}`,
+      Astro.site,
+    ).href
   : undefined;
-const imageSrcset = image && isSanityImage
-  ? `${image}?w=400&h=210&fit=crop&auto=format 400w, ${image}?w=800&h=420&fit=crop&auto=format 800w, ${image}?w=1200&h=630&fit=crop&auto=format 1200w`
+const listImageSrc = image
+  ? new URL(
+      `/cdn-cgi/image/width=300,height=180,fit=cover/${image}`,
+      Astro.site,
+    ).href
   : undefined;
 const sourceInitials = source
-  .split(' ')
+  .split(" ")
   .map((word) => word[0])
   .slice(0, 2)
-  .join('')
+  .join("")
   .toUpperCase();
 
-let hostname = '';
+let hostname = "";
 try {
-  hostname = new URL(url).hostname.replace(/^www\./, '');
+  hostname = new URL(url).hostname.replace(/^www\./, "");
 } catch {
   hostname = source;
 }
@@ -43,18 +62,20 @@ const faviconUrl = hostname
   : undefined;
 
 const shareText = `${title} — via ${source}`;
-const twitterShareUrl = `https://twitter.com/intent/tweet?${new URLSearchParams({
-  url,
-  text: shareText,
-  via: TWITTER_HANDLE.replace('@', ''),
-}).toString()}`;
+const twitterShareUrl = `https://twitter.com/intent/tweet?${new URLSearchParams(
+  {
+    url,
+    text: shareText,
+    via: TWITTER_HANDLE.replace("@", ""),
+  },
+).toString()}`;
 const linkedInShareUrl = `https://www.linkedin.com/sharing/share-offsite/?${new URLSearchParams({ url }).toString()}`;
 const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?${new URLSearchParams({ u: url }).toString()}`;
 const emailShareUrl = `mailto:?${new URLSearchParams({
   subject: title,
   body: `${description}\n\n${url}`,
 }).toString()}`;
-const shareMenuId = `share-menu-${story.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
+const shareMenuId = `share-menu-${story.id.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
 ---
 
 <article
@@ -62,180 +83,229 @@ const shareMenuId = `share-menu-${story.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
     // No overflow-hidden here: it would clip the share popover. The hero
     // image's own wrapper below has its own overflow-hidden + rounded-t-xl
     // to keep the image corners flush with the card.
-    'bg-surface border border-[#dee2e6] rounded-xl p-stack-md hover:bg-surface-variant/50 transition-colors duration-300 flex flex-col gap-2 relative',
-    !priority && 'animate-fade-up',
+    "story-card bg-surface border border-[#dee2e6] rounded-xl p-stack-md hover:bg-surface-variant/50 transition-colors duration-300 flex flex-col gap-2 relative",
+    !priority && "animate-fade-up",
   ]}
 >
-  {featured && (
-    <>
-      <Icon name="star" filled size={20} class="absolute top-3 right-3 z-10 text-secondary" />
-      <span class="sr-only">Featured</span>
-    </>
-  )}
-
-  {image && (
-    <a href={url} target="_blank" rel="noopener noreferrer" class="block -mx-stack-md -mt-stack-md mb-2 overflow-hidden rounded-t-xl">
-      <img
-        src={imageSrc}
-        srcset={imageSrcset}
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 800px"
-        alt={imageAlt ?? title}
-        width="800"
-        height="420"
-        decoding="async"
-        loading={priority ? 'eager' : 'lazy'}
-        fetchpriority={priority ? 'high' : 'auto'}
-        class="w-full h-auto object-cover"
-      />
-    </a>
-  )}
-
-  <div class:list={['flex items-center gap-2 mb-1', featured && 'pr-7']}>
-    <span class="relative w-5 h-5 shrink-0">
-      <span
-        class="favicon-fallback absolute inset-0 flex items-center justify-center bg-surface-variant text-primary text-[8px] px-0.5 rounded uppercase font-bold border border-outline/20"
-        aria-hidden="true"
-      >
-        {sourceInitials}
-      </span>
-      {faviconUrl && (
-        <img
-          src={faviconUrl}
-          alt=""
-          width="20"
-          height="20"
-          loading="lazy"
-          decoding="async"
-          referrerpolicy="no-referrer"
-          class="relative w-5 h-5 rounded object-contain bg-surface-variant"
-          onerror="this.remove()"
+  {
+    featured && (
+      <>
+        <Icon
+          name="star"
+          filled
+          size={20}
+          class="absolute top-3 right-3 z-10 text-secondary"
         />
-      )}
-    </span>
-    <span class="font-label-sm text-label-sm font-bold text-primary">{source}</span>
-    <span class="text-primary text-[10px] opacity-50" aria-hidden="true">•</span>
-    <time datetime={publishedAt.toISOString()} title={formatDate(publishedAt)} class="font-label-sm text-xs text-on-surface-variant">
-      {relativeTime(publishedAt)}
-    </time>
-  </div>
+        <span class="sr-only">Featured</span>
+      </>
+    )
+  }
 
-  <h2 class="font-headline-md text-primary mb-1 line-clamp-2 leading-tight font-bold text-xl">
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      class="hover:text-secondary transition-colors focus-visible:outline-none focus-visible:underline"
-    >
-      {title}
-      <Icon name="open_in_new" size={15} class="ml-[5px] align-middle opacity-60 inline" />
-      <span class="sr-only">(opens {hostname} in a new tab)</span>
-    </a>
-  </h2>
-
-  <p class="font-body-md text-on-surface-variant line-clamp-3 mb-2 text-sm leading-relaxed">{description}</p>
-
-  <div class="flex flex-wrap items-center gap-2 mt-auto pt-3">
-    <a
-      href={`/${categoryUrlSlug(category)}`}
-      class={`story-category-pill ${categoryPillClass(category)} text-on-secondary font-label-md text-label-md px-2 py-1 rounded uppercase tracking-wider text-[10px] font-bold hover:opacity-90 transition-opacity`}
-    >
-      {categoryLabel(category)}
-    </a>
-    {tags.map((tag) => (
+  {
+    image && (
       <a
-        href={`/tag/${tag}`}
-        class="text-on-surface-variant font-label-md text-label-md text-xs hover:text-primary transition-colors"
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="story-thumbnail block -mx-stack-md -mt-stack-md mb-2 overflow-hidden rounded-t-xl"
       >
-        #{tag}
+        <img
+          src={gridImageSrc}
+          data-grid-src={gridImageSrc}
+          data-list-src={listImageSrc}
+          data-fallback-src={image}
+          alt={imageAlt ?? title}
+          width="430"
+          height="200"
+          decoding="async"
+          loading={priority ? "eager" : "lazy"}
+          fetchpriority={priority ? "high" : "auto"}
+          class="w-full object-cover"
+          onerror="this.removeAttribute('onerror');this.setAttribute('src',this.getAttribute('data-fallback-src'))"
+        />
       </a>
-    ))}
+    )
+  }
 
-    <div class="ml-auto flex gap-2">
-      <button
-        type="button"
-        class="bookmark-btn text-primary hover:text-secondary transition-all"
-        aria-pressed="false"
-        aria-label={`Save "${title}" to bookmarks`}
-        data-bookmark-url={url}
-        data-bookmark-title={title}
-        data-bookmark-description={description}
-        data-bookmark-source={source}
-        data-bookmark-category={category}
-        data-bookmark-published={publishedAt.toISOString()}
+  <div class="story-content flex min-w-0 flex-1 flex-col gap-2">
+    <div class:list={["flex items-center gap-2 mb-1", featured && "pr-7"]}>
+      <span class="relative w-5 h-5 shrink-0">
+        <span
+          class="favicon-fallback absolute inset-0 flex items-center justify-center bg-surface-variant text-primary text-[8px] px-0.5 rounded uppercase font-bold border border-outline/20"
+          aria-hidden="true"
+        >
+          {sourceInitials}
+        </span>
+        {
+          faviconUrl && (
+            <img
+              src={faviconUrl}
+              alt=""
+              width="20"
+              height="20"
+              loading="lazy"
+              decoding="async"
+              referrerpolicy="no-referrer"
+              class="relative w-5 h-5 rounded object-contain bg-surface-variant"
+              onerror="this.remove()"
+            />
+          )
+        }
+      </span>
+      <span class="font-label-sm text-label-sm font-bold text-primary"
+        >{source}</span
       >
-        <Icon name="bookmark_add" size={20} />
-      </button>
-      <div class="share-wrapper relative">
+      <span class="text-primary text-[10px] opacity-50" aria-hidden="true"
+        >•</span
+      >
+      <time
+        datetime={publishedAt.toISOString()}
+        title={formatDate(publishedAt)}
+        class="font-label-sm text-xs text-on-surface-variant"
+      >
+        {relativeTime(publishedAt)}
+      </time>
+    </div>
+
+    <h2
+      class="font-headline-md text-primary mb-1 line-clamp-2 leading-tight font-bold text-xl"
+    >
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="hover:text-secondary transition-colors focus-visible:outline-none focus-visible:underline"
+      >
+        {title}
+        <Icon
+          name="open_in_new"
+          size={15}
+          class="ml-[5px] align-middle opacity-60 inline"
+        />
+        <span class="sr-only">(opens {hostname} in a new tab)</span>
+      </a>
+    </h2>
+
+    <p
+      class="font-body-md text-on-surface-variant line-clamp-3 mb-2 text-sm leading-relaxed"
+    >
+      {description}
+    </p>
+
+    <div class="flex flex-wrap items-center gap-2 mt-auto">
+      <a
+        href={`/${categoryUrlSlug(category)}`}
+        class={`story-category-pill ${categoryPillClass(category)} text-on-secondary font-label-md text-label-md px-2 py-1 rounded uppercase tracking-wider text-[10px] font-bold hover:opacity-90 transition-opacity`}
+      >
+        {categoryLabel(category)}
+      </a>
+      {
+        tags.map((tag) => (
+          <a
+            href={`/tag/${tag}`}
+            class="text-on-surface-variant font-label-md text-label-md text-xs hover:text-primary transition-colors"
+          >
+            #{tag}
+          </a>
+        ))
+      }
+
+      <div class="ml-auto flex gap-2">
         <button
           type="button"
-          class="share-btn text-primary hover:text-secondary transition-all"
-          aria-label={`Share "${title}"`}
-          aria-expanded="false"
-          aria-controls={shareMenuId}
-          data-share-url={url}
-          data-share-title={title}
-          data-share-text={description}
+          class="bookmark-btn text-primary hover:text-secondary transition-all"
+          aria-pressed="false"
+          aria-label={`Save "${title}" to bookmarks`}
+          data-bookmark-url={url}
+          data-bookmark-title={title}
+          data-bookmark-description={description}
+          data-bookmark-source={source}
+          data-bookmark-category={category}
+          data-bookmark-published={publishedAt.toISOString()}
         >
-          <Icon name="share" size={20} />
+          <Icon name="bookmark_add" size={20} />
         </button>
-
-        <div
-          id={shareMenuId}
-          class="share-menu hidden absolute right-0 bottom-full mb-2 z-20 w-52 rounded-xl border border-outline bg-background shadow-lg py-1 text-left"
-        >
-          <a
-            href={twitterShareUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="flex items-center gap-2 px-3 py-2 text-sm text-primary hover:bg-surface-variant transition-colors"
-          >
-            <span class="w-5 h-5 shrink-0 rounded bg-black text-white flex items-center justify-center text-[10px] font-bold" aria-hidden="true">X</span>
-            Share on X
-          </a>
-          <a
-            href={linkedInShareUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="flex items-center gap-2 px-3 py-2 text-sm text-primary hover:bg-surface-variant transition-colors"
-          >
-            <span class="w-5 h-5 shrink-0 rounded bg-[#0A66C2] text-white flex items-center justify-center text-[9px] font-bold" aria-hidden="true">in</span>
-            Share on LinkedIn
-          </a>
-          <a
-            href={facebookShareUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="flex items-center gap-2 px-3 py-2 text-sm text-primary hover:bg-surface-variant transition-colors"
-          >
-            <span class="w-5 h-5 shrink-0 rounded bg-[#1877F2] text-white flex items-center justify-center text-[11px] font-bold" aria-hidden="true">f</span>
-            Share on Facebook
-          </a>
-          <a
-            href={emailShareUrl}
-            class="flex items-center gap-2 px-3 py-2 text-sm text-primary hover:bg-surface-variant transition-colors"
-          >
-            <Icon name="mail" size={18} class="w-5 shrink-0" />
-            Share by email
-          </a>
+        <div class="share-wrapper relative">
           <button
             type="button"
-            class="share-native-item hidden items-center gap-2 px-3 py-2 text-sm w-full text-left text-primary hover:bg-surface-variant transition-colors"
+            class="share-btn text-primary hover:text-secondary transition-all"
+            aria-label={`Share "${title}"`}
+            aria-expanded="false"
+            aria-controls={shareMenuId}
             data-share-url={url}
             data-share-title={title}
             data-share-text={description}
           >
-            <Icon name="ios_share" size={16} class="shrink-0" />
-            More options…
+            <Icon name="share" size={20} />
           </button>
-          <hr class="border-outline/40 my-1" />
-          <button
-            type="button"
-            class="copy-link-btn flex items-center gap-2 px-3 py-2 text-sm w-full text-left text-primary hover:bg-surface-variant transition-colors"
-            data-copy-url={url}
+
+          <div
+            id={shareMenuId}
+            class="share-menu hidden absolute right-0 bottom-full mb-2 z-20 w-52 rounded-xl border border-outline bg-background shadow-lg py-1 text-left"
           >
-            <Icon name="link" size={16} class="shrink-0" />
-            <span class="copy-label">Copy link</span>
-          </button>
+            <a
+              href={twitterShareUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center gap-2 px-3 py-2 text-sm text-primary hover:bg-surface-variant transition-colors"
+            >
+              <span
+                class="w-5 h-5 shrink-0 rounded bg-black text-white flex items-center justify-center text-[10px] font-bold"
+                aria-hidden="true">X</span
+              >
+              Share on X
+            </a>
+            <a
+              href={linkedInShareUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center gap-2 px-3 py-2 text-sm text-primary hover:bg-surface-variant transition-colors"
+            >
+              <span
+                class="w-5 h-5 shrink-0 rounded bg-[#0A66C2] text-white flex items-center justify-center text-[9px] font-bold"
+                aria-hidden="true">in</span
+              >
+              Share on LinkedIn
+            </a>
+            <a
+              href={facebookShareUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center gap-2 px-3 py-2 text-sm text-primary hover:bg-surface-variant transition-colors"
+            >
+              <span
+                class="w-5 h-5 shrink-0 rounded bg-[#1877F2] text-white flex items-center justify-center text-[11px] font-bold"
+                aria-hidden="true">f</span
+              >
+              Share on Facebook
+            </a>
+            <a
+              href={emailShareUrl}
+              class="flex items-center gap-2 px-3 py-2 text-sm text-primary hover:bg-surface-variant transition-colors"
+            >
+              <Icon name="mail" size={18} class="w-5 shrink-0" />
+              Share by email
+            </a>
+            <button
+              type="button"
+              class="share-native-item hidden items-center gap-2 px-3 py-2 text-sm w-full text-left text-primary hover:bg-surface-variant transition-colors"
+              data-share-url={url}
+              data-share-title={title}
+              data-share-text={description}
+            >
+              <Icon name="ios_share" size={16} class="shrink-0" />
+              More options…
+            </button>
+            <hr class="border-outline/40 my-1" />
+            <button
+              type="button"
+              class="copy-link-btn flex items-center gap-2 px-3 py-2 text-sm w-full text-left text-primary hover:bg-surface-variant transition-colors"
+              data-copy-url={url}
+            >
+              <Icon name="link" size={16} class="shrink-0" />
+              <span class="copy-label">Copy link</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -243,33 +313,38 @@ const shareMenuId = `share-menu-${story.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
 </article>
 
 <script>
-  import { toggleBookmark, isBookmarked } from '../../lib/bookmarks-client';
+  import { toggleBookmark, isBookmarked } from "../../lib/bookmarks-client";
 
   function renderBookmarkButton(btn: HTMLButtonElement) {
-    const url = btn.dataset.bookmarkUrl ?? '';
-    const title = btn.dataset.bookmarkTitle ?? '';
-    const icon = btn.querySelector<SVGElement>('.icon');
+    const url = btn.dataset.bookmarkUrl ?? "";
+    const title = btn.dataset.bookmarkTitle ?? "";
+    const icon = btn.querySelector<SVGElement>(".icon");
     const saved = isBookmarked(url);
 
-    btn.setAttribute('aria-pressed', String(saved));
-    btn.setAttribute('aria-label', `${saved ? 'Remove' : 'Save'} "${title}" ${saved ? 'from' : 'to'} bookmarks`);
-    btn.classList.toggle('text-primary', !saved);
-    btn.classList.toggle('text-secondary', saved);
-    const path = icon?.querySelector('path');
+    btn.setAttribute("aria-pressed", String(saved));
+    btn.setAttribute(
+      "aria-label",
+      `${saved ? "Remove" : "Save"} "${title}" ${saved ? "from" : "to"} bookmarks`,
+    );
+    btn.classList.toggle("text-primary", !saved);
+    btn.classList.toggle("text-secondary", saved);
+    const path = icon?.querySelector("path");
     const nextD = saved ? icon?.dataset.pathFill : icon?.dataset.pathOutline;
-    if (path && nextD) path.setAttribute('d', nextD);
+    if (path && nextD) path.setAttribute("d", nextD);
   }
 
   // Share is a popover of explicit destinations (X, LinkedIn, Facebook, email,
   // copy link) rather than a bare Web Share API call, so desktop users — who
   // have no native share sheet — still get one-click sharing options.
   function closeAllShareMenus(except?: HTMLElement, returnFocus = false) {
-    document.querySelectorAll<HTMLElement>('.share-menu').forEach((menu) => {
+    document.querySelectorAll<HTMLElement>(".share-menu").forEach((menu) => {
       if (menu === except) return;
-      const wasOpen = !menu.classList.contains('hidden');
-      menu.classList.add('hidden');
-      const shareBtn = menu.closest('.share-wrapper')?.querySelector<HTMLButtonElement>('.share-btn');
-      shareBtn?.setAttribute('aria-expanded', 'false');
+      const wasOpen = !menu.classList.contains("hidden");
+      menu.classList.add("hidden");
+      const shareBtn = menu
+        .closest(".share-wrapper")
+        ?.querySelector<HTMLButtonElement>(".share-btn");
+      shareBtn?.setAttribute("aria-expanded", "false");
       if (wasOpen && returnFocus && shareBtn) {
         shareBtn.focus();
       }
@@ -280,97 +355,104 @@ const shareMenuId = `share-menu-${story.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
   // init has to re-run per page-load — the dataset flags below just guard
   // against binding the same (still-present) element twice within one page.
   function initStoryCards() {
-    document.querySelectorAll<HTMLButtonElement>('.bookmark-btn').forEach((btn) => {
-      if (btn.dataset.bookmarkInit) return;
-      btn.dataset.bookmarkInit = 'true';
+    document
+      .querySelectorAll<HTMLButtonElement>(".bookmark-btn")
+      .forEach((btn) => {
+        if (btn.dataset.bookmarkInit) return;
+        btn.dataset.bookmarkInit = "true";
 
-      renderBookmarkButton(btn);
-
-      btn.addEventListener('click', () => {
-        toggleBookmark({
-          url: btn.dataset.bookmarkUrl ?? '',
-          title: btn.dataset.bookmarkTitle ?? '',
-          description: btn.dataset.bookmarkDescription ?? '',
-          source: btn.dataset.bookmarkSource ?? '',
-          category: btn.dataset.bookmarkCategory ?? '',
-          publishedAt: btn.dataset.bookmarkPublished ?? '',
-        });
         renderBookmarkButton(btn);
+
+        btn.addEventListener("click", () => {
+          toggleBookmark({
+            url: btn.dataset.bookmarkUrl ?? "",
+            title: btn.dataset.bookmarkTitle ?? "",
+            description: btn.dataset.bookmarkDescription ?? "",
+            source: btn.dataset.bookmarkSource ?? "",
+            category: btn.dataset.bookmarkCategory ?? "",
+            publishedAt: btn.dataset.bookmarkPublished ?? "",
+          });
+          renderBookmarkButton(btn);
+        });
       });
-    });
 
-    document.querySelectorAll<HTMLButtonElement>('.share-btn').forEach((btn) => {
-      if (btn.dataset.shareInit) return;
-      btn.dataset.shareInit = 'true';
+    document
+      .querySelectorAll<HTMLButtonElement>(".share-btn")
+      .forEach((btn) => {
+        if (btn.dataset.shareInit) return;
+        btn.dataset.shareInit = "true";
 
-      const wrapper = btn.closest('.share-wrapper');
-      const menu = wrapper?.querySelector<HTMLElement>('.share-menu');
-      const nativeItem = wrapper?.querySelector<HTMLButtonElement>('.share-native-item');
+        const wrapper = btn.closest(".share-wrapper");
+        const menu = wrapper?.querySelector<HTMLElement>(".share-menu");
+        const nativeItem =
+          wrapper?.querySelector<HTMLButtonElement>(".share-native-item");
 
-      if (navigator.share && nativeItem) {
-        nativeItem.classList.remove('hidden');
-        nativeItem.classList.add('flex');
-        nativeItem.addEventListener('click', async () => {
-          closeAllShareMenus();
-          try {
-            await navigator.share({
-              title: nativeItem.dataset.shareTitle ?? '',
-              text: nativeItem.dataset.shareText ?? '',
-              url: nativeItem.dataset.shareUrl ?? '',
-            });
-          } catch {
-            // User cancelled the native share sheet.
+        if (navigator.share && nativeItem) {
+          nativeItem.classList.remove("hidden");
+          nativeItem.classList.add("flex");
+          nativeItem.addEventListener("click", async () => {
+            closeAllShareMenus();
+            try {
+              await navigator.share({
+                title: nativeItem.dataset.shareTitle ?? "",
+                text: nativeItem.dataset.shareText ?? "",
+                url: nativeItem.dataset.shareUrl ?? "",
+              });
+            } catch {
+              // User cancelled the native share sheet.
+            }
+          });
+        }
+
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (!menu) return;
+          const isOpen = !menu.classList.contains("hidden");
+          closeAllShareMenus(isOpen ? undefined : menu);
+          if (!isOpen) {
+            menu.classList.remove("hidden");
+            btn.setAttribute("aria-expanded", "true");
           }
         });
-      }
-
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (!menu) return;
-        const isOpen = !menu.classList.contains('hidden');
-        closeAllShareMenus(isOpen ? undefined : menu);
-        if (!isOpen) {
-          menu.classList.remove('hidden');
-          btn.setAttribute('aria-expanded', 'true');
-        }
       });
-    });
 
-    document.querySelectorAll<HTMLButtonElement>('.copy-link-btn').forEach((btn) => {
-      if (btn.dataset.copyInit) return;
-      btn.dataset.copyInit = 'true';
+    document
+      .querySelectorAll<HTMLButtonElement>(".copy-link-btn")
+      .forEach((btn) => {
+        if (btn.dataset.copyInit) return;
+        btn.dataset.copyInit = "true";
 
-      btn.addEventListener('click', async (e) => {
-        // Keep the menu open long enough to show the "Copied!" confirmation
-        // instead of letting the document-level click-away handler close it.
-        e.stopPropagation();
-        const url = btn.dataset.copyUrl ?? '';
-        const label = btn.querySelector<HTMLElement>('.copy-label');
+        btn.addEventListener("click", async (e) => {
+          // Keep the menu open long enough to show the "Copied!" confirmation
+          // instead of letting the document-level click-away handler close it.
+          e.stopPropagation();
+          const url = btn.dataset.copyUrl ?? "";
+          const label = btn.querySelector<HTMLElement>(".copy-label");
 
-        try {
-          await navigator.clipboard.writeText(url);
-          if (label) {
-            const original = label.textContent;
-            label.textContent = 'Copied!';
-            setTimeout(() => {
-              label.textContent = original;
-              closeAllShareMenus();
-            }, 900);
+          try {
+            await navigator.clipboard.writeText(url);
+            if (label) {
+              const original = label.textContent;
+              label.textContent = "Copied!";
+              setTimeout(() => {
+                label.textContent = original;
+                closeAllShareMenus();
+              }, 900);
+            }
+          } catch {
+            // Clipboard unavailable (e.g. insecure context) — nothing more we can do silently.
           }
-        } catch {
-          // Clipboard unavailable (e.g. insecure context) — nothing more we can do silently.
-        }
+        });
       });
-    });
   }
 
   initStoryCards();
-  document.addEventListener('astro:page-load', initStoryCards);
+  document.addEventListener("astro:page-load", initStoryCards);
 
   // Document-level listeners: document itself is never replaced by
   // ClientRouter, so these are safe to register exactly once.
-  document.addEventListener('click', () => closeAllShareMenus());
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeAllShareMenus(undefined, true);
+  document.addEventListener("click", () => closeAllShareMenus());
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeAllShareMenus(undefined, true);
   });
 </script>

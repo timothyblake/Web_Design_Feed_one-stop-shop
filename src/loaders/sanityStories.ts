@@ -16,7 +16,7 @@ const STORIES_QUERY = `*[_type == "story" && defined(publishedAt)] | order(publi
   "tags": coalesce(tags, []),
   featured,
   publishedAt,
-  "image": coalesce(thumbnailUrl, image.asset->url),
+  "image": coalesce(thumbnailUrl, sourceImageUrl, image.asset->url),
   imageAlt
 }`;
 

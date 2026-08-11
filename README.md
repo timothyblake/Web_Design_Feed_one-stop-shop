@@ -327,6 +327,30 @@ For local testing, build the site and run `npx wrangler dev`; wrangler simulates
 
 Protect both `webdesignfeed.com/studio/*` and `webdesignfeed.com/api/fetch-thumbnail` in the same Cloudflare Access self-hosted application restricted to editors. This gives Studio requests an Access session before the action calls the API. The Worker also rejects cross-origin requests, private-network image URLs, oversized/unsupported source images, and non-POST methods, but the origin check is not a substitute for authentication.
 
+### Sanity-triggered production builds
+
+The Worker exposes `POST /api/sanity-webhook` for rebuilding the static site when a Story is published, updated, unpublished, or deleted. It verifies the raw request body with Sanity's signed-webhook toolkit before calling a Cloudflare Workers Builds Deploy Hook. Do not protect this route with the editor-only Cloudflare Access policy used by Studio; the Sanity signature is its authentication mechanism.
+
+Configure these as encrypted Worker secrets (never in `wrangler.jsonc` or `.env`):
+
+```bash
+npx wrangler secret put SANITY_WEBHOOK_SECRET
+npx wrangler secret put CLOUDFLARE_DEPLOY_HOOK_URL
+```
+
+Create the Sanity document webhook with these settings:
+
+- URL: `https://webdesignfeed.com/api/sanity-webhook`
+- Dataset: `production`
+- Trigger on: create, update, and delete
+- Filter: `_type == "story"`
+- Projection: `{_id, _type}`
+- HTTP method: POST
+- Drafts and versions: disabled
+- Secret: the same value stored in `SANITY_WEBHOOK_SECRET`
+
+The Cloudflare hook must target the `main` branch. Its URL is a credential and belongs only in `CLOUDFLARE_DEPLOY_HOOK_URL`. Run `npm run test:worker` to verify signature rejection, story filtering, and build-trigger handling locally.
+
 For bulk operations, `npm run import:stories -- path/to/stories.json` accepts an array shaped like the example above. It requires a non-public `SANITY_API_TOKEN` with write permission. The Markdown files in `src/content/stories` are retained only as input for the one-time `migrate:sanity` script and are not the live content source.
 
 ## Managing categories

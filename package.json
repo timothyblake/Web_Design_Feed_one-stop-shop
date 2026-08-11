@@ -10,7 +10,9 @@
     "build": "astro build",
     "postbuild": "pagefind --site dist",
     "preview": "astro preview",
-    "check": "astro check",
+    "check": "astro check && npm run check:worker",
+    "check:worker": "tsc -p worker/tsconfig.json",
+    "test:worker": "node --experimental-strip-types --test worker/index.test.ts",
     "astro": "astro",
     "migrate:sanity": "node scripts/migrate-stories-to-sanity.mjs",
     "import:stories": "node scripts/import-stories-json.mjs"
@@ -25,6 +27,7 @@
     "@sanity/client": "^7.24.0",
     "@sanity/image-url": "^2.1.1",
     "@sanity/vision": "^6.6.0",
+    "@sanity/webhook": "^4.0.4",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.1.3",
     "react": "^19.2.8",
