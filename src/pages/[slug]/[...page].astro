@@ -27,7 +27,7 @@ export const getStaticPaths = (async ({ paginate }) => {
     return paginate(categoryStories, {
       params: { slug: categoryUrlSlug(category.slug) },
       props: { categorySlug: category.slug },
-      pageSize: 10,
+      pageSize: 12,
     });
   });
 }) satisfies GetStaticPaths;

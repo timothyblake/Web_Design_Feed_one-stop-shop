@@ -24,7 +24,7 @@ export const getStaticPaths = (async ({ paginate }) => {
     return paginate(tagStories, {
       params: { slug: tag },
       props: { tag },
-      pageSize: 10,
+      pageSize: 12,
     });
   });
 }) satisfies GetStaticPaths;
