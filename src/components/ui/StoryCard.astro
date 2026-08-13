@@ -213,7 +213,7 @@ const shareMenuId = `share-menu-${story.id.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
       <div class="ml-auto flex gap-2">
         <button
           type="button"
-          class="bookmark-btn flex items-center text-primary hover:text-secondary transition-all"
+          class="bookmark-btn flex items-center p-1 -m-1 rounded text-primary hover:text-secondary transition-all"
           aria-pressed="false"
           aria-label={`Save "${title}" to bookmarks`}
           data-bookmark-url={url}
@@ -228,7 +228,7 @@ const shareMenuId = `share-menu-${story.id.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
         <div class="share-wrapper relative">
           <button
             type="button"
-            class="share-btn flex items-center text-primary hover:text-secondary transition-all"
+            class="share-btn flex items-center p-1 -m-1 rounded text-primary hover:text-secondary transition-all"
             aria-label={`Share "${title}"`}
             aria-expanded="false"
             aria-controls={shareMenuId}

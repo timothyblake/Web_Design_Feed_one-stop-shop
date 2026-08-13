@@ -44,7 +44,14 @@ const schemas = structuredData ? (Array.isArray(structuredData) ? structuredData
 <title>{pageTitle}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
-{noindex && <meta name="robots" content="noindex" />}
+{noindex ? (
+  <meta name="robots" content="noindex" />
+) : (
+  // Google ignores this on non-index directives, so it only needs pairing
+  // with the indexable case: hints search results to use a large thumbnail
+  // instead of defaulting to a small/cropped one.
+  <meta name="robots" content="max-image-preview:large" />
+)}
 
 <!-- Icons & manifest -->
 <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
@@ -63,6 +70,9 @@ const schemas = structuredData ? (Array.isArray(structuredData) ? structuredData
 <meta property="og:site_name" content={SITE_TITLE} />
 <meta property="og:image" content={ogImageUrl} />
 <meta property="og:image:alt" content={ogImageAlt} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:type" content="image/png" />
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image" />

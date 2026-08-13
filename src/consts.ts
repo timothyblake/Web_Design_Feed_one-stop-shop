@@ -8,7 +8,6 @@ export const TWITTER_HANDLE = '@webdesignfeed';
 
 export const CATEGORIES = [
   { slug: 'ui-ux-design', label: 'UI & UX Design', icon: 'palette', pill: 'secondary' },
-  { slug: 'design', label: 'Design', icon: 'brush', pill: 'accent-ink' },
   { slug: 'front-end', label: 'Front-end', icon: 'code', pill: 'accent-ink' },
   { slug: 'web-dev', label: 'Web Dev', icon: 'terminal', pill: 'secondary' },
   { slug: 'resources', label: 'Resources', icon: 'construction', pill: 'accent-ink' },
@@ -26,6 +25,7 @@ export type CategorySlug = (typeof CATEGORIES)[number]['slug'];
 
 const LEGACY_CATEGORY_SLUGS: Record<string, CategorySlug> = {
   'ui-design': 'ui-ux-design',
+  design: 'ui-ux-design',
   career: 'business',
   tools: 'resources',
   'back-end': 'web-dev',
@@ -40,8 +40,6 @@ export function normalizeCategorySlug(slug: string): string {
 export const CATEGORY_DESCRIPTIONS: Record<CategorySlug, string> = {
   'ui-ux-design':
     'Explore thoughtful UI and UX design, design systems, accessibility, research, interaction patterns, and the craft behind better digital products.',
-  design:
-    'Explore visual design, branding, graphic design, typography, layout inspiration, color theory, and creative direction from top designers and studios.',
   'front-end':
     'Stay current with practical CSS, JavaScript, frameworks, browser APIs, accessibility, performance, and modern front-end architecture.',
   'web-dev':
@@ -59,11 +57,6 @@ export const CATEGORY_BLURBS: Record<CategorySlug, string[]> = {
     'UI & UX Design stories cover the full product-design process: research, interaction design, layout, typography, color systems, motion, and the decisions behind products people use every day.',
     "Expect deep dives into design systems, accessibility-first patterns, user experience, and critiques of what's working (and what isn't) in modern product design.",
     'These stories link to the original source — designers, agencies, and studios sharing their process in public.',
-  ],
-  design: [
-    'Design stories focus on visual craft, typography, layout, graphic design, branding, and aesthetic direction across digital and print media.',
-    'Discover inspiration, design commentary, case studies, and creative techniques from leading studios, art directors, and designers.',
-    'Read original articles and showcases linked directly from the creators.',
   ],
   'front-end': [
     'Front-end stories track the browser side of the stack: frameworks, CSS, JavaScript, performance, and the APIs shipping in evergreen browsers.',
